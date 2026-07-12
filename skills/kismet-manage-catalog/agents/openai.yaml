@@ -1,0 +1,11 @@
+interface:
+  display_name: "Kismet Catalog Manager"
+  short_description: "Curate and publish Kismet property catalogs"
+  default_prompt: "Use $kismet-manage-catalog to review and improve my Kismet collection catalog."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "kismet-platform"
+      description: "Authenticated Kismet manager operations"
+      transport: "streamable_http"
+      url: "https://mcp.kismet.travel/user-mcp"

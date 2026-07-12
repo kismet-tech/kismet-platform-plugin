@@ -1,0 +1,11 @@
+interface:
+  display_name: "Kismet Advertising"
+  short_description: "Analyze and manage ads and audiences safely"
+  default_prompt: "Use $kismet-manage-advertising to review campaign performance and recommend next actions."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "kismet-platform"
+      description: "Authenticated Kismet advertising operations"
+      transport: "streamable_http"
+      url: "https://mcp.kismet.travel/user-mcp"

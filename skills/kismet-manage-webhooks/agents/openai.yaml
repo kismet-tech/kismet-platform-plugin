@@ -1,0 +1,11 @@
+interface:
+  display_name: "Kismet Webhook Automation"
+  short_description: "Configure scoped alerts and webhook automations"
+  default_prompt: "Use $kismet-manage-webhooks to design an alert and preview its configuration."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "kismet-platform"
+      description: "Authenticated Kismet webhook automation"
+      transport: "streamable_http"
+      url: "https://mcp.kismet.travel/user-mcp"

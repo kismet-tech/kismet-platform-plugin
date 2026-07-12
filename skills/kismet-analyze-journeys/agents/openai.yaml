@@ -1,0 +1,11 @@
+interface:
+  display_name: "Kismet Journey Analytics"
+  short_description: "Analyze scoped guest journeys and performance"
+  default_prompt: "Use $kismet-analyze-journeys to investigate performance across my Kismet collections."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "kismet-platform"
+      description: "Authenticated Kismet manager analytics"
+      transport: "streamable_http"
+      url: "https://mcp.kismet.travel/user-mcp"

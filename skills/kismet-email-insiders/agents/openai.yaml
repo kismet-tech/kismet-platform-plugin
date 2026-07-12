@@ -1,0 +1,11 @@
+interface:
+  display_name: "Kismet Insiders Email"
+  short_description: "Create and measure consented-member campaigns"
+  default_prompt: "Use $kismet-email-insiders to plan a member email campaign with a safe preview."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "kismet-platform"
+      description: "Authenticated Kismet Insiders campaigns"
+      transport: "streamable_http"
+      url: "https://mcp.kismet.travel/user-mcp"

@@ -1,0 +1,11 @@
+interface:
+  display_name: "Kismet Generate Demand"
+  short_description: "Diagnose and generate booking demand safely"
+  default_prompt: "Use $kismet-generate-demand to build an evidence-based plan for generating more bookings."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "kismet-platform"
+      description: "Authenticated Kismet demand, catalog, analytics, and marketing operations"
+      transport: "streamable_http"
+      url: "https://mcp.kismet.travel/user-mcp"

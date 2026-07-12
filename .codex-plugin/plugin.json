@@ -1,0 +1,39 @@
+{
+  "name": "kismet-platform",
+  "version": "0.1.0+codex.20260712190534",
+  "description": "Kismet Platform MCP for catalogs, analytics, campaigns, advertising, audiences, and automations.",
+  "author": {
+    "name": "Kismet"
+  },
+  "homepage": "https://kismet.travel/",
+  "keywords": [
+    "kismet",
+    "hospitality",
+    "catalog",
+    "analytics",
+    "marketing"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Kismet Platform MCP",
+    "shortDescription": "Operate Kismet through the Platform MCP.",
+    "longDescription": "The authenticated Kismet Platform MCP workspace: curate catalogs, analyze journeys, run Insiders email, manage ads and audiences, and configure outbound automations.",
+    "developerName": "Kismet",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://kismet.travel/",
+    "defaultPrompt": [
+      "Audit my Kismet portfolio and recommend next actions.",
+      "Analyze performance across my Kismet collections.",
+      "Help me safely preview a Kismet catalog or campaign change."
+    ],
+    "brandColor": "#111827",
+    "composerIcon": "./assets/kismet-icon.png",
+    "logo": "./assets/kismet-logo.png"
+  },
+  "mcpServers": "./.mcp.json"
+}
