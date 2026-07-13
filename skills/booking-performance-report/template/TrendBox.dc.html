@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/kismet-aurora-design-system-50c1498e-db6f-4961-9f61-89e9a07d2a53/css/fonts.css">
+  <link rel="stylesheet" href="_ds/kismet-aurora-design-system-50c1498e-db6f-4961-9f61-89e9a07d2a53/css/theme.css">
+</helmet>
+<div style="border:1px solid var(--line);border-radius:12px;background:#fff;padding:1.05rem 1.15rem;display:flex;flex-direction:column;gap:.7rem;height:100%;break-inside:avoid">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem">
+    <span style="font-family:var(--mono);font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--tx-soft)">{{ label }}</span>
+    <span style="display:inline-flex;align-items:center;gap:.32rem;font-family:var(--mono);font-size:.6rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:.24rem .55rem;border-radius:999px;background:{{ tintBg }};color:{{ accent }}"><span style="font-size:.7em;line-height:1">{{ arrow }}</span>{{ statusLabel }}</span>
+  </div>
+  <div style="display:flex;align-items:baseline;gap:.4rem">
+    <span style="font-family:var(--mono);font-weight:600;font-size:1.85rem;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:{{ accent }}">{{ value }}</span>
+    <span style="font-size:.8rem;color:var(--tx-soft)">{{ unit }}</span>
+  </div>
+  <p style="margin:0;font-size:.79rem;line-height:1.5;color:var(--tx-soft)">{{ note }}</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:300,&quot;height&quot;:200},&quot;label&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;AI assistants&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;value&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;26%&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;unit&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;of linked direct&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;note&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;~2× referral payout/booking. 95 of 103 properties cited by AI crawlers this month.&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;status&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;positive&quot;,&quot;watch&quot;,&quot;risk&quot;],&quot;default&quot;:&quot;positive&quot;,&quot;tsType&quot;:&quot;'positive'|'watch'|'risk'&quot;},&quot;direction&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;up&quot;,&quot;down&quot;,&quot;flat&quot;],&quot;default&quot;:&quot;up&quot;,&quot;tsType&quot;:&quot;'up'|'down'|'flat'&quot;},&quot;statusLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props || {};
+    const status = p.status || "positive";
+    const map = {
+      positive: { c: "#0F9B6C", bg: "rgba(16,185,129,.13)", label: "Growing" },
+      watch:    { c: "#6D45D6", bg: "rgba(124,58,237,.13)", label: "Watch" },
+      risk:     { c: "#565E70", bg: "rgba(86,94,112,.14)", label: "Attention" },
+    };
+    const s = map[status] || map.positive;
+    const dir = p.direction || "up";
+    const arrow = dir === "up" ? "▲" : dir === "down" ? "▼" : "—";
+    return { accent: s.c, tintBg: s.bg, statusLabel: p.statusLabel || s.label, arrow };
+  }
+}
+</script>
+</body>
+</html>

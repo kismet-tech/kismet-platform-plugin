@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/kismet-aurora-design-system-50c1498e-db6f-4961-9f61-89e9a07d2a53/css/fonts.css">
+  <link rel="stylesheet" href="_ds/kismet-aurora-design-system-50c1498e-db6f-4961-9f61-89e9a07d2a53/css/theme.css">
+</helmet>
+<!-- Print-safe: no box-shadow (Chromium prints unblurred gray boxes in fragmented
+     layouts) and no background-clip:text on the value (prints as a solid rect
+     behind the number) — the border is the card; the value is solid accent. -->
+<div style="border:1px solid var(--line);border-radius:12px;background:#fff;padding:1.15rem 1.25rem;display:flex;flex-direction:column;gap:.5rem;height:100%;break-inside:avoid">
+  <sc-if value="{{ tag }}" hint-placeholder-val="">
+    <span style="align-self:flex-start;font-family:var(--mono);font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);background:var(--accent-soft);padding:.24rem .55rem;border-radius:999px">{{ tag }}</span>
+  </sc-if>
+  <span style="font-family:var(--mono);font-weight:600;font-size:2.5rem;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--accent);width:fit-content">{{ value }}</span>
+  <span style="font-family:var(--sans);font-weight:600;font-size:.96rem;line-height:1.25;color:var(--tx)">{{ label }}</span>
+  <span style="font-size:.8rem;line-height:1.5;color:var(--tx-soft)">{{ context }}</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:260,&quot;height&quot;:170},&quot;value&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;49%&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;label&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Direct share of payout&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;context&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Entirely organic / referral / AI — no ad spend live&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;tag&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;}}"></script>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/kismet-aurora-design-system-50c1498e-db6f-4961-9f61-89e9a07d2a53/css/fonts.css">
+  <link rel="stylesheet" href="_ds/kismet-aurora-design-system-50c1498e-db6f-4961-9f61-89e9a07d2a53/css/theme.css">
+  <link rel="stylesheet" href="_ds/kismet-aurora-design-system-50c1498e-db6f-4961-9f61-89e9a07d2a53/css/aurora-extensions.css">
+  <link rel="stylesheet" href="_ds/kismet-aurora-design-system-50c1498e-db6f-4961-9f61-89e9a07d2a53/styles.css">
+  <script src="_ds/kismet-aurora-design-system-50c1498e-db6f-4961-9f61-89e9a07d2a53/_ds_bundle.js"></script>
+  <script src="report-data.js" type="module"></script>
+  <style>
+    doc-page:not(:defined){visibility:hidden}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{color:var(--violet)}
+    .kick{break-after:avoid} /* keep section eyebrows with their headings at page breaks */
+    /* Print chapters: major sections start on a fresh sheet (the border-top rule
+       and stacking margin read wrong at a page top, so they reset). Spotlights and
+       Opportunities flow to tile with their neighbors; Bottom line pairs with Fix first. */
+    section[data-screen-label="Where bookings come from"],
+    section[data-screen-label="Direct source"],
+    section[data-screen-label="Group breakdown"],
+    section[data-screen-label="Fix first"]{break-before:page;border-top:none !important;margin-top:0 !important;padding-top:.4rem !important}
+    /* Section headers never strand from their first content block */
+    section > h2{break-after:avoid}
+    section > h2 + p{break-after:avoid}
+    /* Chromium prints box-shadows as unblurred gray boxes in fragmented layouts —
+       borders carry the card affordance in print (light-DOM safety net; the
+       components dropped their shadows at source) */
+    @media print{*{box-shadow:none !important;text-shadow:none !important}}
+    /* CLIENT BRAND ACCENT — uncomment and set to get_collection_content._widgetConfig.ctaColor.
+       Retints eyebrows, labels, headline numbers, bars; quadrant keeps its own palette.
+       :root{--accent:#194d5d;--aurora:#194d5d;--accent-soft:#e4edef} */
+  </style>
+</helmet>
+<x-import component-from-global-scope="doc-page" from="./doc-page.js" size="letter" margin="0.7in" hint-size="100%,100%">
+
+<!-- Footer: report name (hyperlinked to its hosted platform page once publish_report
+     returns a URL — see SKILL.md step 7) stacked over the signature. -->
+<div slot="footer" style="display:flex;flex-direction:column;gap:.14rem;font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;color:var(--tx-faint);text-transform:uppercase;border-top:1px solid var(--line);padding-top:.4rem">
+  <sc-if value="{{ reportUrl }}" hint-placeholder-val="">
+    <a href="{{ reportUrl }}" style="color:var(--accent);text-decoration:none">{{ reportName }}</a>
+  </sc-if>
+  <sc-if value="{{ reportUnlinked }}" hint-placeholder-val="true">
+    <span style="color:var(--tx-soft)">{{ reportName }}</span>
+  </sc-if>
+  <span>Prepared by {{ preparedBy }}</span>
+</div>
+
+<!-- ============ MASTHEAD ============ -->
+<div data-screen-label="Report header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.7rem">
+  <div style="display:flex;align-items:center;gap:.9rem">
+<!-- BRANDING: the logo is data-driven — set meta.logoUrl in report-data.js (from
+     get_collection_content._widgetConfig.logoUrl). It renders frameless at its own
+     aspect ratio; no logo → set flags.logo:false. The dashed slot below appears
+     only while meta.logoUrl is empty (template preview state — never deliver it). -->
+    <sc-if value="{{ showLogoImg }}" hint-placeholder-val="">
+      <img src="{{ logoUrl }}" alt="{{ clientName }} logo" style="height:56px;width:auto;max-width:170px;display:block;flex:none">
+    </sc-if>
+    <sc-if value="{{ showLogoSlot }}" hint-placeholder-val="true">
+    <div style="width:60px;height:60px;flex:none;border:1px dashed var(--line-strong);border-radius:9px;overflow:hidden">
+      <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="client-logo" shape="rect" placeholder="Logo" hint-size="100%,100%"></x-import>
+    </div>
+    </sc-if>
+    <div>
+      <div style="font-weight:600;font-size:1.05rem;color:var(--tx);line-height:1.2">{{ clientName }}</div>
+      <div style="font-family:var(--mono);font-size:.72rem;color:var(--tx-faint);letter-spacing:.02em;margin-top:.15rem">{{ site }}</div>
+    </div>
+  </div>
+  <div style="text-align:right">
+    <div style="display:inline-flex;align-items:center;gap:.45rem"><img src="https://kismet.travel/kismet-mark.svg" alt="Kismet" style="width:22px;height:22px;display:block"><span style="font-family:var(--sans);font-weight:600;font-size:.95rem;color:var(--tx);letter-spacing:-.01em">Kismet</span></div>
+    <div style="font-family:var(--mono);font-size:.6rem;color:var(--tx-faint);letter-spacing:.05em;line-height:1.8;margin-top:.5rem">{{ periodShort }} · {{ generated }}</div>
+  </div>
+</div>
+
+<p class="kick">Performance report</p>
+<h1 style="font-family:var(--sans);font-weight:600;font-size:2.4rem;line-height:1.08;letter-spacing:-.02em;color:var(--tx);margin:.15rem 0 .55rem;text-wrap:balance">Where your bookings come from</h1>
+<p style="max-width:62ch;color:var(--tx-soft);font-size:1.03rem;line-height:1.6;margin:0">A read on channels, groups, and where paid growth is de-risked — with the tracking caveats called out honestly, so you know which numbers are floors and which are firm. {{ period }}.</p>
+
+<!-- ============ HEADLINE STATS ============ -->
+<section data-screen-label="Headline stats" style="margin-top:2rem">
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem">
+    <sc-for list="{{ headlineStats }}" as="s" hint-placeholder-count="4">
+      <dc-import name="StatCallout" value="{{ s.value }}" label="{{ s.label }}" context="{{ s.context }}" tag="{{ s.tag }}" hint-size="100%,160px"></dc-import>
+    </sc-for>
+  </div>
+</section>
+
+<!-- ============ CHANNELS ============ -->
+<section data-screen-label="Where bookings come from" style="margin-top:2.6rem;padding-top:2rem;border-top:1px solid var(--line)">
+  <p class="kick">Channels</p>
+  <h2 style="font-family:var(--mono);font-weight:500;font-size:1.42rem;letter-spacing:-.01em;color:var(--tx);margin:0 0 .35rem">Where bookings come from</h2>
+  <p style="max-width:60ch;color:var(--tx-soft);font-size:.95rem;line-height:1.6;margin:.2rem 0 1.4rem">By channel over the last 30 days, confirmed bookings only. Direct already carries the largest share of host payout — before a single ad dollar.</p>
+
+  <div style="display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.6rem">
+    <sc-for list="{{ channelRows }}" as="c" hint-placeholder-count="5">
+      <div style="display:grid;grid-template-columns:110px 1fr 168px;align-items:center;gap:.9rem">
+        <span style="font-size:.85rem;color:var(--tx);font-weight:500">{{ c.name }}</span>
+        <div style="background:var(--panel-2);border-radius:3px;height:22px;position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;bottom:0;width:{{ c.pct }};background:var(--aurora);border-radius:3px"></div>
+        </div>
+        <span style="font-family:var(--mono);font-size:.78rem;color:var(--tx-soft);font-variant-numeric:tabular-nums;text-align:right">{{ c.payoutFmt }} · {{ c.share }}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <table style="width:100%;border-collapse:collapse;font-size:.82rem;break-inside:avoid">
+    <thead>
+      <tr>
+        <th style="text-align:left;font-family:var(--mono);font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx-faint);padding:.4rem .5rem;border-bottom:1.5px solid var(--line-strong)">Channel</th>
+        <th style="text-align:right;font-family:var(--mono);font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx-faint);padding:.4rem .5rem;border-bottom:1.5px solid var(--line-strong)">Bookings</th>
+        <th style="text-align:right;font-family:var(--mono);font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx-faint);padding:.4rem .5rem;border-bottom:1.5px solid var(--line-strong)">Host payout</th>
+        <th style="text-align:right;font-family:var(--mono);font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx-faint);padding:.4rem .5rem;border-bottom:1.5px solid var(--line-strong)">Share</th>
+      </tr>
+    </thead>
+    <tbody>
+      <sc-for list="{{ channelRows }}" as="c" hint-placeholder-count="5">
+        <tr>
+          <td style="text-align:left;padding:.5rem;border-bottom:1px solid var(--line);color:var(--tx);font-weight:500">{{ c.name }}</td>
+          <td style="text-align:right;padding:.5rem;border-bottom:1px solid var(--line);color:var(--tx-soft);font-family:var(--mono);font-variant-numeric:tabular-nums">{{ c.bookings }}</td>
+          <td style="text-align:right;padding:.5rem;border-bottom:1px solid var(--line);color:var(--tx-soft);font-family:var(--mono);font-variant-numeric:tabular-nums">{{ c.payoutFmt }}</td>
+          <td style="text-align:right;padding:.5rem;border-bottom:1px solid var(--line);color:var(--tx-soft);font-family:var(--mono);font-variant-numeric:tabular-nums">{{ c.share }}</td>
+        </tr>
+      </sc-for>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ DIRECT SOURCE ============ -->
+<section data-screen-label="Direct source" style="margin-top:2.6rem;padding-top:2rem;border-top:1px solid var(--line)">
+  <p class="kick">Direct · first touch</p>
+  <h2 style="font-family:var(--mono);font-weight:500;font-size:1.42rem;letter-spacing:-.01em;color:var(--tx);margin:0 0 .35rem">What's driving direct</h2>
+  <p style="max-width:64ch;color:var(--tx-soft);font-size:.95rem;line-height:1.6;margin:.2rem 0 1.4rem">First-touch source for direct bookings — <b style="color:var(--tx)">journey-linked only ({{ directLinked }} of {{ directTotal }})</b>. The other {{ directUnlinked }} are unlinked due to the tracking gap, so treat every number below as a floor.</p>
+
+  <table style="width:100%;border-collapse:collapse;font-size:.82rem;break-inside:avoid;margin-bottom:1.8rem">
+    <thead>
+      <tr>
+        <th style="text-align:left;font-family:var(--mono);font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx-faint);padding:.4rem .5rem;border-bottom:1.5px solid var(--line-strong)">Source</th>
+        <th style="text-align:right;font-family:var(--mono);font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx-faint);padding:.4rem .5rem;border-bottom:1.5px solid var(--line-strong)">Bookings</th>
+        <th style="text-align:right;font-family:var(--mono);font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx-faint);padding:.4rem .5rem;border-bottom:1.5px solid var(--line-strong)">Host payout</th>
+        <th style="text-align:left;font-family:var(--mono);font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx-faint);padding:.4rem .5rem;border-bottom:1.5px solid var(--line-strong);width:34%">Relative payout</th>
+      </tr>
+    </thead>
+    <tbody>
+      <sc-for list="{{ directRows }}" as="s" hint-placeholder-count="5">
+        <tr>
+          <td style="text-align:left;padding:.5rem;border-bottom:1px solid var(--line);color:var(--tx);font-weight:500">{{ s.source }}</td>
+          <td style="text-align:right;padding:.5rem;border-bottom:1px solid var(--line);color:var(--tx-soft);font-family:var(--mono);font-variant-numeric:tabular-nums">{{ s.bookings }}</td>
+          <td style="text-align:right;padding:.5rem;border-bottom:1px solid var(--line);color:var(--tx-soft);font-family:var(--mono);font-variant-numeric:tabular-nums">{{ s.payoutFmt }}</td>
+          <td style="padding:.5rem;border-bottom:1px solid var(--line)">
+            <div style="background:var(--panel-2);border-radius:3px;height:14px;position:relative;overflow:hidden">
+              <div style="position:absolute;top:0;left:0;bottom:0;width:{{ s.pct }};background:var(--aurora);border-radius:3px"></div>
+            </div>
+          </td>
+        </tr>
+      </sc-for>
+    </tbody>
+  </table>
+
+  <p style="font-family:var(--mono);font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin:0 0 .8rem;break-after:avoid">Two things stand out — honestly labeled</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem">
+    <dc-import name="TrendBox" label="{{ trendAI.label }}" value="{{ trendAI.value }}" unit="{{ trendAI.unit }}" note="{{ trendAI.note }}" status="{{ trendAI.status }}" direction="{{ trendAI.direction }}" hint-size="100%,200px"></dc-import>
+    <dc-import name="TrendBox" label="{{ trendGoogle.label }}" value="{{ trendGoogle.value }}" unit="{{ trendGoogle.unit }}" note="{{ trendGoogle.note }}" status="{{ trendGoogle.status }}" direction="{{ trendGoogle.direction }}" hint-size="100%,200px"></dc-import>
+  </div>
+  <p style="font-size:.88rem;line-height:1.6;color:var(--tx-soft);margin:0"><b style="color:var(--tx)">[Standout #1 headline]</b> — [one quantified sentence, with its caveat labeled]. <b style="color:var(--tx)">[Standout #2 headline]</b> — [one quantified sentence, then where the headroom is].</p>
+</section>
+
+<!-- ============ GROUP BREAKDOWN ============ -->
+<section data-screen-label="Group breakdown" style="margin-top:2.6rem;padding-top:2rem;border-top:1px solid var(--line)">
+  <p class="kick">Groups</p>
+  <h2 style="font-family:var(--mono);font-weight:500;font-size:1.42rem;letter-spacing:-.01em;color:var(--tx);margin:0 0 .35rem">Group breakdown</h2>
+  <p style="max-width:66ch;color:var(--tx-soft);font-size:.95rem;line-height:1.6;margin:.2rem 0 1.4rem">[N] groups with live pages; below covers groups with ≥5 members and ≥3 direct bookings — the table reads the direct funnel (OTA stays in the channel mix). <b style="color:var(--tx)">Demand</b> = sessions per member home; <b style="color:var(--tx)">conversion</b> = direct bookings per 1,000 member sessions; high/low cut = this collection's own medians ([X] sessions/home, [Y] bookings/1k — keep in sync with groupMedians). [One sentence naming this run's biggest data caveat.]</p>
+
+  <!-- Group table first (it breaks cleanly across pages; thead repeats, rows stay
+       atomic). The atomic quadrant plot follows mid-flow so it lands wherever it
+       fits without stranding a near-empty page. -->
+  <table style="width:100%;border-collapse:collapse;font-size:.72rem;margin-bottom:1.6rem">
+    <thead>
+      <tr>
+        <th style="text-align:left;font-family:var(--mono);font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-faint);padding:.4rem .45rem;border-bottom:1.5px solid var(--line-strong)">Group</th>
+        <th style="text-align:right;font-family:var(--mono);font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-faint);padding:.4rem .35rem;border-bottom:1.5px solid var(--line-strong)">Homes</th>
+        <th style="text-align:right;font-family:var(--mono);font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-faint);padding:.4rem .35rem;border-bottom:1.5px solid var(--line-strong)">Sessions</th>
+        <th style="text-align:right;font-family:var(--mono);font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-faint);padding:.4rem .35rem;border-bottom:1.5px solid var(--line-strong)">Bk</th>
+        <th style="text-align:right;font-family:var(--mono);font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-faint);padding:.4rem .35rem;border-bottom:1.5px solid var(--line-strong)">Payout</th>
+        <th style="text-align:right;font-family:var(--mono);font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-faint);padding:.4rem .35rem;border-bottom:1.5px solid var(--line-strong)">$/Bk</th>
+        <th style="text-align:right;font-family:var(--mono);font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-faint);padding:.4rem .35rem;border-bottom:1.5px solid var(--line-strong)">Demand</th>
+        <th style="text-align:right;font-family:var(--mono);font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-faint);padding:.4rem .35rem;border-bottom:1.5px solid var(--line-strong)">Conv/1k</th>
+        <th style="text-align:left;font-family:var(--mono);font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx-faint);padding:.4rem .45rem;border-bottom:1.5px solid var(--line-strong)">Quadrant</th>
+      </tr>
+    </thead>
+    <tbody>
+      <sc-for list="{{ groupRows }}" as="g" hint-placeholder-count="15">
+        <tr style="background:{{ g.rowBg }}">
+          <td style="text-align:left;padding:.42rem .45rem;border-bottom:1px solid var(--line);color:var(--tx);font-weight:500"><span>{{ g.name }}</span> <span style="font-family:var(--mono);font-size:.55rem;color:var(--tx-faint);text-transform:uppercase">· {{ g.typeLabel }}</span></td>
+          <td style="text-align:right;padding:.42rem .35rem;border-bottom:1px solid var(--line);color:var(--tx-soft);font-family:var(--mono);font-variant-numeric:tabular-nums">{{ g.members }}</td>
+          <td style="text-align:right;padding:.42rem .35rem;border-bottom:1px solid var(--line);color:var(--tx-soft);font-family:var(--mono);font-variant-numeric:tabular-nums">{{ g.sessions }}</td>
+          <td style="text-align:right;padding:.42rem .35rem;border-bottom:1px solid var(--line);color:var(--tx-soft);font-family:var(--mono);font-variant-numeric:tabular-nums">{{ g.bookings }}</td>
+          <td style="text-align:right;padding:.42rem .35rem;border-bottom:1px solid var(--line);color:var(--tx-soft);font-family:var(--mono);font-variant-numeric:tabular-nums">{{ g.payoutFmt }}</td>
+          <td style="text-align:right;padding:.42rem .35rem;border-bottom:1px solid var(--line);color:var(--tx);font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600">{{ g.perBooking }}</td>
+          <td style="text-align:right;padding:.42rem .35rem;border-bottom:1px solid var(--line);color:var(--tx-soft);font-family:var(--mono);font-variant-numeric:tabular-nums">{{ g.demand }}</td>
+          <td style="text-align:right;padding:.42rem .35rem;border-bottom:1px solid var(--line);color:var(--tx-soft);font-family:var(--mono);font-variant-numeric:tabular-nums">{{ g.conv }}</td>
+          <td style="text-align:left;padding:.42rem .45rem;border-bottom:1px solid var(--line)"><span style="display:inline-flex;align-items:center;gap:.3rem;font-family:var(--mono);font-size:.62rem;color:var(--tx)"><span style="width:8px;height:8px;border-radius:2px;background:{{ g.color }}"></span>{{ g.quadLabel }}</span></td>
+        </tr>
+      </sc-for>
+    </tbody>
+  </table>
+
+  <!-- Quadrant plot -->
+  <div style="break-inside:avoid;margin-bottom:1.6rem">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem;margin-bottom:.6rem">
+      <span style="font-family:var(--mono);font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx-soft)">Demand × conversion</span>
+      <span style="font-family:var(--mono);font-size:.62rem;color:var(--tx-faint)">▲ conversion (bookings / 1k sessions) &nbsp;·&nbsp; ▶ demand (sessions / home)</span>
+    </div>
+    <div style="display:flex;gap:.5rem">
+      <div style="writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--tx-faint);text-align:center;padding:.5rem 0">Conversion →</div>
+      <div style="flex:1">
+        <div style="position:relative;height:340px;background:var(--panel);border-left:1.5px solid var(--line-strong);border-bottom:1.5px solid var(--line-strong);border-radius:0 8px 0 0">
+          <!-- median lines -->
+          <div style="position:absolute;top:0;bottom:0;left:{{ medX }};width:1px;background:repeating-linear-gradient(var(--line-strong) 0 4px,transparent 4px 8px)"></div>
+          <div style="position:absolute;left:0;right:0;bottom:{{ medY }};height:1px;background:repeating-linear-gradient(90deg,var(--line-strong) 0 4px,transparent 4px 8px)"></div>
+          <!-- quadrant labels -->
+          <span style="position:absolute;left:.6rem;top:.5rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:#4F46E5;opacity:.55">Fuel</span>
+          <span style="position:absolute;right:.6rem;top:.5rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:#0F9B6C;opacity:.6">Expand</span>
+          <span style="position:absolute;left:.6rem;bottom:.5rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:#8892A3;opacity:.6">Hold</span>
+          <span style="position:absolute;right:.6rem;bottom:.5rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:#D97706;opacity:.6">Fix</span>
+          <!-- dots — color follows POSITION (strict median cut) so the picture never
+               contradicts itself; analyst quadrant calls live in the table chips -->
+          <sc-for list="{{ groupRows }}" as="g" hint-placeholder-count="10">
+            <div style="position:absolute;left:{{ g.x }};bottom:{{ g.y }};transform:translate(-50%,50%);z-index:2">
+              <div style="width:11px;height:11px;border-radius:{{ g.marker }};background:{{ g.plotColor }};border:1.5px solid #fff"></div>
+              <sc-if value="{{ g.showLabel }}" hint-placeholder-val="">
+                <span style="position:absolute;{{ g.labelPos }}:15px;top:-3px;white-space:nowrap;font-family:var(--mono);font-size:.57rem;color:var(--tx);background:rgba(247,248,252,.82);padding:0 .22rem;border-radius:2px">{{ g.name }}</span>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--tx-faint);text-align:center;padding-top:.4rem">Demand →</div>
+      </div>
+    </div>
+    <!-- Legend: shape = type (outline glyphs, no color meaning); color = quadrant -->
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.3rem;margin-top:.7rem;font-family:var(--mono);font-size:.6rem;color:var(--tx-soft)">
+      <span style="display:inline-flex;align-items:center;gap:.35rem"><span style="width:9px;height:9px;border-radius:50%;border:1.5px solid var(--tx-faint)"></span>Theme</span>
+      <span style="display:inline-flex;align-items:center;gap:.35rem"><span style="width:9px;height:9px;border:1.5px solid var(--tx-faint)"></span>Region</span>
+      <span style="color:var(--line-strong)">|</span>
+      <span style="display:inline-flex;align-items:center;gap:.35rem"><span style="width:10px;height:10px;border-radius:50%;background:#0F9B6C"></span>Expand</span>
+      <span style="display:inline-flex;align-items:center;gap:.35rem"><span style="width:10px;height:10px;border-radius:50%;background:#4F46E5"></span>Fuel</span>
+      <span style="display:inline-flex;align-items:center;gap:.35rem"><span style="width:10px;height:10px;border-radius:50%;background:#D97706"></span>Fix</span>
+      <span style="display:inline-flex;align-items:center;gap:.35rem"><span style="width:10px;height:10px;border-radius:50%;background:#8892A3"></span>Hold / Baseline</span>
+    </div>
+    <p style="font-size:.8rem;line-height:1.55;color:var(--tx-faint);margin:.8rem 0 0">Regions capture existing search intent; themes create differentiated demand — they're quadranted on the same axes but shouldn't be ranked against each other. Dot color follows position; where an analyst call moves a borderline group, the table's quadrant chip carries it.</p>
+  </div>
+
+  <!-- Priority reads -->
+  <div style="margin-top:1.4rem">
+    <p style="font-family:var(--mono);font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin:0 0 .7rem">Priority reads</p>
+    <div style="display:flex;flex-direction:column;gap:.5rem">
+      <sc-for list="{{ priorityReads }}" as="g" hint-placeholder-count="6">
+        <div style="display:flex;gap:.7rem;align-items:baseline;break-inside:avoid">
+          <span style="flex:none;font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#fff;background:{{ g.color }};border-radius:999px;padding:.15rem .55rem;min-width:56px;text-align:center">{{ g.quadLabel }}</span>
+          <p style="margin:0;font-size:.86rem;line-height:1.5;color:var(--tx-soft)"><b style="color:var(--tx)">{{ g.name }}</b> — {{ g.note }}.</p>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- Long tail -->
+  <div style="margin-top:1.6rem;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.25rem;break-inside:avoid">
+    <p style="font-family:var(--mono);font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx-soft);margin:0 0 .5rem">Long tail &amp; hygiene</p>
+    <p style="margin:0 0 .55rem;font-size:.86rem;line-height:1.55;color:var(--tx-soft)">{{ longTail.note }} <span style="color:var(--tx-faint)">({{ longTail.towns }})</span></p>
+    <p style="margin:0 0 .55rem;font-size:.86rem;line-height:1.55;color:var(--tx-soft)">{{ longTail.ungrouped }}</p>
+    <sc-if value="{{ showOutlier }}" hint-placeholder-val="true">
+    <p style="margin:0;font-size:.86rem;line-height:1.55;color:var(--tx-soft)"><b style="color:var(--tx)">Outlier worth knowing:</b> the single-home <b style="color:var(--tx)">{{ outlier.name }}</b> page did {{ outlier.bookings }} bookings / {{ outlierPayout }} this month — one home out-earning entire town groups.</p>
+    </sc-if>
+  </div>
+</section>
+
+<!-- ============ PROPERTY SPOTLIGHTS ============ -->
+<!-- Data-driven from report-data.js `spotlights[]` — 2-4 individual homes whose
+     stories the group numbers hide (top earner, premium outlier, traffic-no-conversion).
+     Suppress with flags.spotlights:false or an empty array. -->
+<sc-if value="{{ showSpotlights }}" hint-placeholder-val="true">
+<section data-screen-label="Property spotlights" style="margin-top:2.6rem;padding-top:2rem;border-top:1px solid var(--line)">
+  <p class="kick">Property spotlights</p>
+  <h2 style="font-family:var(--mono);font-weight:500;font-size:1.42rem;letter-spacing:-.01em;color:var(--tx);margin:0 0 .35rem">Homes behind the numbers</h2>
+  <p style="max-width:64ch;color:var(--tx-soft);font-size:.95rem;line-height:1.6;margin:.2rem 0 1.4rem">Group medians hide individual stories. These are the homes worth acting on this month — what they earned, what they refused, and what that says about where to point effort next.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem">
+    <sc-for list="{{ spotlights }}" as="s" hint-placeholder-count="2">
+      <div style="border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;break-inside:avoid">
+        <img src="{{ s.imageUrl }}" alt="{{ s.name }}" style="display:block;width:100%;height:150px;object-fit:cover">
+        <div style="padding:.9rem 1rem">
+          <span style="font-family:var(--mono);font-size:.58rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--accent)">{{ s.eyebrow }}</span>
+          <h3 style="font-family:var(--sans);font-weight:600;font-size:1.02rem;color:var(--tx);margin:.35rem 0 .35rem;letter-spacing:-.01em">{{ s.name }}</h3>
+          <div style="font-family:var(--mono);font-size:.68rem;color:var(--tx-soft);font-variant-numeric:tabular-nums;margin-bottom:.55rem">{{ s.stats }}</div>
+          <p style="margin:0;font-size:.82rem;line-height:1.55;color:var(--tx-soft)">{{ s.fact }}</p>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+</sc-if>
+
+<!-- ============ OPPORTUNITIES ============ -->
+<section data-screen-label="Opportunities" style="margin-top:2.6rem;padding-top:2rem;border-top:1px solid var(--line)">
+  <p class="kick">Opportunities</p>
+  <h2 style="font-family:var(--mono);font-weight:500;font-size:1.42rem;letter-spacing:-.01em;color:var(--tx);margin:0 0 1.2rem">Where to grow — in order</h2>
+
+  <!-- Opp 1 -->
+  <div style="display:flex;gap:1rem;margin-bottom:1.7rem;break-inside:avoid">
+    <div style="flex:none;width:2.4rem;height:2.4rem;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:1.05rem">1</div>
+    <div>
+      <h3 style="font-family:var(--mono);font-weight:500;font-size:1.1rem;margin:.1rem 0 .6rem;color:var(--tx);letter-spacing:-.01em">[Opportunity 1 — the highest-impact, most de-risked growth move]</h3>
+      <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0 0 .5rem"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Evidence</span>[The phase 1–3 numbers that make this the top move — quantified: payout shares vs inventory shares, per-booking payout, what's connected and what isn't.]</p>
+      <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0 0 .5rem"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Mechanism</span>[Why this should produce bookings — the causal story connecting evidence to action. Campaigns always land on a matched page, never the homepage.]</p>
+      <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Action</span>[What the operator does next — channel, campaign targets, destination group pages, geo assumption + how to confirm it, and the sequencing gate.]</p>
+    </div>
+  </div>
+
+  <!-- Opp 2 -->
+  <div style="display:flex;gap:1rem;margin-bottom:1.7rem;break-inside:avoid">
+    <div style="flex:none;width:2.4rem;height:2.4rem;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:1.05rem">2</div>
+    <div>
+      <h3 style="font-family:var(--mono);font-weight:500;font-size:1.1rem;margin:.1rem 0 .6rem;color:var(--tx);letter-spacing:-.01em">[Opportunity 2 — the fix-quadrant page where demand is being refused]</h3>
+      <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0 0 .5rem"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Evidence</span>[Demand vs conversion numbers for the fix-quadrant group; label small samples.]</p>
+      <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0 0 .5rem"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Mechanism</span>[Why conversion is the bottleneck here — price position, photos/copy, minimum stays, or a measurement gap. High demand + low conversion is the one quadrant where new spend is wasted until fixed.]</p>
+      <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Action</span>[The audit: compare against the collection's best converters on rates, photos, min-stays; when to re-check; which groups get the same treatment next.]</p>
+    </div>
+  </div>
+
+  <!-- Opp 3 -->
+  <div style="display:flex;gap:1rem;margin-bottom:1.7rem;break-inside:avoid">
+    <div style="flex:none;width:2.4rem;height:2.4rem;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:1.05rem">3</div>
+    <div>
+      <h3 style="font-family:var(--mono);font-weight:500;font-size:1.1rem;margin:.1rem 0 .6rem;color:var(--tx);letter-spacing:-.01em">[Opportunity 3 — the zero-marginal-spend content/AI move]</h3>
+      <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0 0 .5rem"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Evidence</span>[Linked AI share + payout per booking; properties cited; the inferred exposure upper bound, labeled inferred — not attribution.]</p>
+      <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0 0 .5rem"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Mechanism</span>[Why specific, crawlable pages win AI citations — intersection pages match the questions assistants actually get asked.]</p>
+      <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Action</span>[Which 1–2 intersection pages to add (≥6 qualifying homes each — confirm overlap before proposing), which thin pages to consolidate, and how these become ad destinations later.]</p>
+    </div>
+  </div>
+
+  <!-- Opp 4 -->
+  <div style="display:flex;gap:1rem;margin-bottom:1.7rem;break-inside:avoid">
+    <div style="flex:none;width:2.4rem;height:2.4rem;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:1.05rem">4</div>
+    <div>
+      <h3 style="font-family:var(--mono);font-weight:500;font-size:1.1rem;margin:.1rem 0 .6rem;color:var(--tx);letter-spacing:-.01em">[Opportunity 4 — the fuel-quadrant group with the best quiet economics]</h3>
+      <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0 0 .5rem"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Evidence</span>[The fuel-quadrant numbers: conversion rank, payout per booking, total payout, and how little traffic it took.]</p>
+      <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0 0 .5rem"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Mechanism</span>[Why demand is the only missing input, and how precisely the audience can be targeted once ads are live.]</p>
+      <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Action</span>[How to thicken the group (thin pages read as dead ends), when to fold it into the ad wave, and the re-verification window for the small sample.]</p>
+    </div>
+  </div>
+
+  <!-- Opp 5 — optional; suppress with flags.opp5:false in report-data.js (drops its TrendBox too; "Quote pressure" then only needs a trends[] entry if another box shows it) -->
+  <sc-if value="{{ showOpp5 }}" hint-placeholder-val="true">
+  <div style="display:flex;gap:1rem;break-inside:avoid">
+    <div style="flex:none;width:2.4rem;height:2.4rem;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:1.05rem">5</div>
+    <div style="flex:1">
+      <h3 style="font-family:var(--mono);font-weight:500;font-size:1.1rem;margin:.1rem 0 .6rem;color:var(--tx);letter-spacing:-.01em">[Opportunity 5 — seasonal timing from date pressure; small sample, hold loosely]</h3>
+      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:1rem;align-items:start">
+        <div>
+          <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0 0 .5rem"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Evidence</span>[Date-pressure signal: checkout-intent sessions by target check-in month — near-term urgency months and any far-out months already showing real counts.]</p>
+          <p style="font-size:.9rem;line-height:1.6;color:var(--tx-soft);margin:0"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-right:.45rem">Action</span>[Near-term availability push; longer-term calendar/rate readiness for the far-out months; what NOT to build on a small sample.]</p>
+        </div>
+        <dc-import name="TrendBox" label="{{ trendQuote.label }}" value="{{ trendQuote.value }}" unit="{{ trendQuote.unit }}" note="{{ trendQuote.note }}" status="{{ trendQuote.status }}" direction="{{ trendQuote.direction }}" hint-size="100%,200px"></dc-import>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+</section>
+
+<!-- ============ FIX FIRST ============ -->
+<section data-screen-label="Fix first" style="margin-top:2.6rem;padding-top:2rem;border-top:1px solid var(--line)">
+  <p class="kick">Fix first</p>
+  <h2 style="font-family:var(--mono);font-weight:500;font-size:1.42rem;letter-spacing:-.01em;color:var(--tx);margin:0 0 1rem">Before you scale spend</h2>
+
+  <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:1.4rem;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div style="display:flex;gap:.8rem;break-inside:avoid">
+        <span style="flex:none;font-family:var(--mono);font-weight:600;color:var(--tx-faint)">01</span>
+        <p style="margin:0;font-size:.9rem;line-height:1.6;color:var(--tx-soft)"><b style="color:var(--tx)">[Funnel-measurement item]</b> — [state of checkout-intent capture: intents vs human sessions, what is being fixed, how to confirm]. <b style="color:var(--tx)">Do this before scaling any ad spend</b> — ads into an unmeasurable funnel burn budget and feed platforms incomplete conversion signals.</p>
+      </div>
+      <div style="display:flex;gap:.8rem;break-inside:avoid">
+        <span style="flex:none;font-family:var(--mono);font-weight:600;color:var(--tx-faint)">02</span>
+        <p style="margin:0;font-size:.9rem;line-height:1.6;color:var(--tx-soft)"><b style="color:var(--tx)">[Linked-coverage item]</b> — [linked share of direct bookings and what that makes a floor; when to re-run the analysis and which verdicts deserve a retrial on clean data].</p>
+      </div>
+      <div style="display:flex;gap:.8rem;break-inside:avoid">
+        <span style="flex:none;font-family:var(--mono);font-weight:600;color:var(--tx-faint)">03</span>
+        <p style="margin:0;font-size:.9rem;line-height:1.6;color:var(--tx-soft)"><b style="color:var(--tx)">Geo data resolves only to country.</b> Before spending on geo-targeted ads, confirm the drive-market assumption against guest home addresses from the PMS.</p>
+      </div>
+    </div>
+    <dc-import name="TrendBox" label="{{ trendIntent.label }}" value="{{ trendIntent.value }}" unit="{{ trendIntent.unit }}" note="{{ trendIntent.note }}" status="{{ trendIntent.status }}" direction="{{ trendIntent.direction }}" hint-size="100%,220px"></dc-import>
+  </div>
+</section>
+
+<!-- ============ BOTTOM LINE ============ -->
+<section data-screen-label="Bottom line" style="margin-top:1.6rem;break-inside:avoid">
+  <div style="position:relative;overflow:hidden;border-radius:14px;color:#fff;padding:1.6rem 1.7rem">
+    <div class="mesh m-aurora" style="position:absolute;inset:0"></div>
+    <div style="position:absolute;inset:0;background-image:var(--grain);background-size:190px 190px;opacity:.4;mix-blend-mode:soft-light;pointer-events:none"></div>
+    <div style="position:relative;z-index:1">
+      <p style="font-family:var(--mono);font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--emerald-300);margin:0 0 .6rem">The bottom line</p>
+      <p style="font-family:var(--serif);font-weight:500;font-size:1.45rem;line-height:1.34;color:#fff;margin:0 0 1.2rem;max-width:44ch">[The one-paragraph verdict — answer the question the operator is actually asking, then sequence it.]</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.9rem">
+        <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:.85rem .95rem">
+          <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--emerald-300);margin-bottom:.35rem">Week 1</div>
+          <div style="font-size:.85rem;line-height:1.45;color:#EDEEF4">[The gating step]</div>
+        </div>
+        <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:.85rem .95rem">
+          <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--emerald-300);margin-bottom:.35rem">Weeks 2–3</div>
+          <div style="font-size:.85rem;line-height:1.45;color:#EDEEF4">[The go move]</div>
+        </div>
+        <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:.85rem .95rem">
+          <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--emerald-300);margin-bottom:.35rem">In parallel</div>
+          <div style="font-size:.85rem;line-height:1.45;color:#EDEEF4">[The parallel fix]</div>
+        </div>
+        <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:.85rem .95rem">
+          <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--emerald-300);margin-bottom:.35rem">Next 30-day read</div>
+          <div style="font-size:.85rem;line-height:1.45;color:#EDEEF4">[What to revisit on clean data]</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INSTALL THE USER MCP (viewer CTA) ============ -->
+<!-- Renders when meta.mcpInstallUrl is set — the deep link into the platform's
+     MCP page on the account route (/account/collections/{slug}/mcp-endpoints).
+     For viewers of the hosted report: get this collection's live data and
+     reports like this one into their own agent. -->
+<sc-if value="{{ showMcpCta }}" hint-placeholder-val="">
+<section data-screen-label="Install the User MCP" style="margin-top:1.2rem;break-inside:avoid">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:1.2rem;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:1rem 1.25rem;background:var(--panel)">
+    <div style="min-width:260px;flex:1">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem"><img src="https://kismet.travel/kismet-mark.svg" alt="" style="width:18px;height:18px;display:block"><span style="font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--tx-soft)">Work with this report in your own agent</span></div>
+      <p style="margin:0;font-size:.82rem;line-height:1.5;color:var(--tx-soft)">The Kismet User MCP puts this collection's live booking data — and reports like this one — directly in your AI's hands.</p>
+    </div>
+    <a href="{{ mcpInstallUrl }}" style="flex:none;display:inline-block;font-family:var(--sans);font-weight:600;font-size:.88rem;color:#fff;background:var(--accent);padding:.6rem 1.1rem;border-radius:9px;text-decoration:none">Install Kismet User MCP</a>
+  </div>
+</section>
+</sc-if>
+
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { d: null };
+  async componentDidMount() {
+    try {
+      const m = await import("./report-data.js");
+      this.setState({ d: m.data });
+    } catch (e) {
+      if (typeof window !== "undefined" && window.ReportData) this.setState({ d: window.ReportData });
+    }
+  }
+  fmt(n) { return "$" + Number(n).toLocaleString("en-US"); }
+  renderVals() {
+    const d = this.state.d;
+    if (!d) return {};
+    const meta = d.meta;
+    const clientName = meta.client && meta.client.trim() ? meta.client : "[ Client name ]";
+
+    const maxPay = Math.max.apply(null, d.channels.map(c => c.payout));
+    const channelRows = d.channels.map(c => ({
+      name: c.name, bookings: c.bookings, payoutFmt: this.fmt(c.payout),
+      share: c.share + "%", pct: (c.payout / maxPay * 100).toFixed(1) + "%",
+    }));
+
+    const maxDir = Math.max.apply(null, d.directSources.map(s => s.payout));
+    const directRows = d.directSources.map(s => ({
+      source: s.source, bookings: s.bookings, payoutFmt: this.fmt(s.payout),
+      pct: (s.payout / maxDir * 100).toFixed(1) + "%",
+    }));
+
+    // Quadrant axes auto-scale to this collection's own ranges (with padding so
+    // no dot sits on an edge) — the medians land wherever the data puts them.
+    const dems = d.groups.map(g => g.sessions / g.members);
+    const convs = d.groups.map(g => g.bookings / g.sessions * 1000);
+    const xPad = Math.max((Math.max(...dems) - Math.min(...dems)) * 0.08, Math.max(...dems) * 0.02, 1);
+    const yPad = Math.max((Math.max(...convs) - Math.min(...convs)) * 0.08, Math.max(...convs) * 0.02, 0.1);
+    const XMIN = Math.max(0, Math.min(...dems) - xPad), XMAX = Math.max(...dems) + xPad;
+    const YMIN = Math.max(0, Math.min(...convs) - yPad), YMAX = Math.max(...convs) + yPad;
+    const px = v => (Math.min(Math.max(v, XMIN), XMAX) - XMIN) / (XMAX - XMIN) * 100;
+    const py = v => (Math.min(Math.max(v, YMIN), YMAX) - YMIN) / (YMAX - YMIN) * 100;
+    const qColor = { expand: "#0F9B6C", fuel: "#4F46E5", fix: "#D97706", hold: "#8892A3", baseline: "#8892A3" };
+    const med = d.groupMedians;
+    const groupRows = d.groups.map(g => {
+      const demand = g.sessions / g.members;
+      const conv = g.bookings / g.sessions * 1000;
+      // strict quadrant from position vs the SAME median lines the plot draws —
+      // dot color and dot position can never disagree
+      const strictQuad = (demand >= med.sessionsPerHome)
+        ? (conv >= med.conversionPer1k ? "expand" : "fix")
+        : (conv >= med.conversionPer1k ? "fuel" : "hold");
+      return {
+        name: g.name, type: g.type, typeLabel: g.type === "region" ? "Region" : "Theme",
+        members: g.members, sessions: g.sessions.toLocaleString("en-US"), bookings: g.bookings,
+        payoutFmt: this.fmt(g.payout), perBooking: "$" + (g.payout / g.bookings / 1000).toFixed(1) + "k",
+        demand: Math.round(demand), conv: conv.toFixed(1),
+        quadrant: g.quadrant, quadLabel: g.quadrant.charAt(0).toUpperCase() + g.quadrant.slice(1),
+        note: g.note, highlight: !!g.highlight,
+        // label highlights AND the baseline dot (an unlabeled gray marker reads as noise)
+        showLabel: !!g.highlight || g.quadrant === "baseline",
+        x: px(demand).toFixed(1) + "%", y: py(conv).toFixed(1) + "%",
+        // labels stay inside the frame; the baseline dot sits near the medians by
+        // construction, so its label goes on the side AWAY from the median line
+        labelPos: g.quadrant === "baseline"
+          ? (demand < med.sessionsPerHome ? "right" : "left")
+          : (px(demand) > 72 ? "right" : "left"),
+        color: qColor[g.quadrant] || "#8892A3",        // analyst quadrant — table chips + pills
+        plotColor: g.quadrant === "baseline" ? qColor.baseline : qColor[strictQuad],
+        marker: g.type === "region" ? "2px" : "50%",
+        rowBg: g.highlight ? "color-mix(in srgb, var(--accent) 7%, transparent)" : "transparent",
+      };
+    });
+    const priorityReads = groupRows.filter(g => g.highlight);
+
+    const t = {};
+    d.trends.forEach(x => { t[x.label] = x; });
+
+    // Element-suppression flags: optional blocks render unless report-data.js
+    // sets flags.<name>: false (missing flags object = everything shows).
+    const flags = d.flags || {};
+    const outlier = d.longTail.outlier || {};
+    const logoUrl = (meta.logoUrl || "").trim();
+    const spotlights = Array.isArray(d.spotlights) ? d.spotlights : [];
+    const reportUrl = (meta.reportUrl || "").trim();
+    const reportName = (meta.reportName || "").trim() || clientName + " · Booking performance";
+    const mcpInstallUrl = (meta.mcpInstallUrl || "").trim();
+
+    return {
+      logoUrl,
+      reportUrl, reportName, reportUnlinked: !reportUrl,
+      mcpInstallUrl, showMcpCta: !!mcpInstallUrl,
+      showLogoImg: flags.logo !== false && !!logoUrl,
+      showLogoSlot: flags.logo !== false && !logoUrl,
+      spotlights,
+      showSpotlights: flags.spotlights !== false && spotlights.length > 0,
+      showOpp5: flags.opp5 !== false,
+      showOutlier: flags.outlier !== false && outlier.name != null,
+      clientName, site: meta.site, period: meta.period, periodShort: meta.periodShort,
+      generated: meta.generated, preparedBy: meta.preparedBy,
+      headlineStats: d.headlineStats, channelRows, directRows,
+      directLinked: d.directLinked, directTotal: d.directTotal,
+      directUnlinked: d.directTotal - d.directLinked,
+      groupRows, priorityReads,
+      medX: px(med.sessionsPerHome).toFixed(1) + "%",
+      medY: py(med.conversionPer1k).toFixed(1) + "%",
+      trendAI: t["AI assistants"], trendGoogle: t["Organic Google"],
+      trendQuote: t["Quote pressure"], trendIntent: t["Checkout-intent capture"],
+      longTail: d.longTail, outlier,
+      outlierPayout: outlier.payout != null ? this.fmt(outlier.payout) : "",
+    };
+  }
+}
+</script>
+</body>
+</html>
