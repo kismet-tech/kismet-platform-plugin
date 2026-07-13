@@ -1,30 +1,50 @@
-# Kismet Platform MCP
+# Kismet Platform plugin
 
-The official Codex plugin for operating Kismet through the authenticated [Kismet User MCP](https://mcp.kismet.travel/user-mcp).
+Operate your [Kismet](https://kismet.travel) portfolio from your AI assistant.
+This plugin works in **Claude** (claude.ai and Claude Code) and **ChatGPT /
+Codex**: installing it configures the authenticated Kismet Platform MCP
+connection and adds task-ready skills for the day-to-day jobs of running
+direct bookings — so you can ask for outcomes ("fill my empty August nights")
+instead of driving tools one call at a time.
 
-It packages the MCP connection with task-oriented skills for:
+## What you get
 
-- generating demand across Direct, Google, ChatGPT, Meta, and owned channels
-- analyzing guest journeys and booking performance
-- managing catalogs and merchandising
-- managing advertising and audiences
-- planning and operating Insiders email
-- configuring webhooks and outbound automations
+- **The Kismet Platform MCP connection**, configured automatically. Sign in
+  with your Kismet manager account when prompted; everything is scoped to the
+  collections you manage.
+- **Operating skills:**
+  - `kismet-generate-demand` — diagnose inventory, traffic, conversion, and
+    channel opportunities, then build a bounded cross-channel demand plan.
+  - `kismet-analyze-journeys` — analyze guest journeys and booking performance.
+  - `kismet-manage-catalog` — curate collections, groups, and property
+    merchandising.
+  - `kismet-manage-advertising` — plan and manage ad campaigns and audiences.
+  - `kismet-email-insiders` — plan and operate Insiders email campaigns.
+  - `kismet-manage-webhooks` — configure webhooks and outbound automations.
 
-## Install in Codex
+New skills land here automatically as Kismet ships them.
 
-Add the repository as a plugin marketplace, then install `kismet-platform` from that marketplace. Codex will prompt you to authenticate with the Kismet User MCP when a skill needs platform data.
+## Install
 
-## Channel model
+- **claude.ai** — Settings → Directory → Plugins → **Add marketplace** →
+  `kismet-tech/kismet-platform-plugin`, then install **kismet-platform**.
+- **Claude Code** — `/plugin marketplace add kismet-tech/kismet-platform-plugin`,
+  then `/plugin install kismet-platform@kismet`.
+- **ChatGPT / Codex** — add this repository as a plugin marketplace and
+  install **kismet-platform**. You'll be prompted to authenticate with the
+  Kismet Platform MCP the first time a skill needs your data.
 
-The Generate Demand skill keeps booking outcome separate from acquisition source and acquisition mode. Google, ChatGPT, and Meta can each contribute organic and paid demand; a `DIRECT` reservation is not treated as proof that the acquisition source was Direct.
+## Safety model
 
-## Structure
+Skills read before they propose, and preview before they write: any change to
+your catalog, campaigns, or automations is shown to you first and only applied
+after your explicit approval. Your credentials stay with Kismet's OAuth
+sign-in — the plugin never handles passwords or API keys.
 
-- `.codex-plugin/plugin.json` — plugin manifest and presentation metadata
-- `.mcp.json` — Kismet User MCP connection
-- `skills/` — task-oriented operating skills
-- `references/` — capability inventory and routing architecture
-- `assets/` — Kismet Platform MCP brand assets
+## Support
 
-The canonical Claude-compatible Generate Demand source and packaged `.skill` file are maintained in the Kismet infrastructure repository so they can be distributed through the User MCP skills registry.
+Questions or requests: [engineering@makekismet.com](mailto:engineering@makekismet.com)
+· [kismet.travel](https://kismet.travel)
+
+Skill content in this repository is published automatically from Kismet's
+source repository; versions here always match what the Kismet platform serves.
