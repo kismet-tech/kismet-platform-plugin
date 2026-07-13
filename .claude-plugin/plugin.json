@@ -1,0 +1,9 @@
+{
+  "name": "kismet-platform",
+  "description": "The authenticated Kismet Platform MCP workspace: curate catalogs, analyze journeys, run Insiders email, manage ads and audiences, and configure outbound automations. Powered by the Kismet User MCP.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Kismet",
+    "email": "engineering@makekismet.com"
+  }
+}

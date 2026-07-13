@@ -1,0 +1,23 @@
+{
+  "name": "kismet",
+  "owner": {
+    "name": "Kismet",
+    "email": "engineering@makekismet.com"
+  },
+  "metadata": {
+    "description": "Official Kismet plugin marketplace for property managers and hotel operators. Skill content is mirrored from kismet-infrastructure skills-src (the source of truth) by CI.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "kismet-platform",
+      "source": "./",
+      "description": "The authenticated Kismet Platform MCP workspace: curate catalogs, analyze journeys, run Insiders email, manage ads and audiences, and configure outbound automations.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Kismet",
+        "email": "engineering@makekismet.com"
+      }
+    }
+  ]
+}
