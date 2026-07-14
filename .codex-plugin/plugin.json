@@ -1,7 +1,7 @@
 {
   "name": "kismet-platform",
   "version": "0.1.0+codex.20260712190534",
-  "description": "Kismet Platform MCP for catalogs, analytics, campaigns, advertising, audiences, and automations.",
+  "description": "Kismet for Operators: run your Kismet business — catalogs, analytics, demand, advertising, Insiders email, and automations — from your AI.",
   "author": {
     "name": "Kismet"
   },
@@ -15,9 +15,9 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "Kismet Platform MCP",
-    "shortDescription": "Operate Kismet through the Platform MCP.",
-    "longDescription": "The authenticated Kismet Platform MCP workspace: curate catalogs, analyze journeys, run Insiders email, manage ads and audiences, and configure outbound automations.",
+    "displayName": "Kismet for Operators",
+    "shortDescription": "Operate your Kismet business from your AI.",
+    "longDescription": "Kismet for Operators — the authenticated workspace for running your Kismet business from your AI: curate catalogs, analyze guest journeys, generate demand, run Insiders email, manage ads and audiences, and configure automations.",
     "developerName": "Kismet",
     "category": "Productivity",
     "capabilities": [

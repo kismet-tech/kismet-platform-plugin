@@ -1,15 +1,15 @@
-# Kismet Platform plugin
+# Kismet for Operators
 
 Operate your [Kismet](https://kismet.travel) portfolio from your AI assistant.
 This plugin works in **Claude** (claude.ai and Claude Code) and **ChatGPT /
-Codex**: installing it configures the authenticated Kismet Platform MCP
+Codex**: installing it configures the authenticated Kismet
 connection and adds task-ready skills for the day-to-day jobs of running
 direct bookings — so you can ask for outcomes ("fill my empty August nights")
 instead of driving tools one call at a time.
 
 ## What you get
 
-- **The Kismet Platform MCP connection**, configured automatically. Sign in
+- **The Kismet connection**, configured automatically. Sign in
   with your Kismet manager account when prompted; everything is scoped to the
   collections you manage.
 - **Operating skills:**
@@ -32,7 +32,7 @@ New skills land here automatically as Kismet ships them.
   then `/plugin install kismet-platform@kismet`.
 - **ChatGPT / Codex** — add this repository as a plugin marketplace and
   install **kismet-platform**. You'll be prompted to authenticate with the
-  Kismet Platform MCP the first time a skill needs your data.
+  Kismet the first time a skill needs your data.
 
 ## Safety model
 

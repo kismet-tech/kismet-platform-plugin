@@ -1,6 +1,6 @@
 {
   "name": "kismet-platform",
-  "description": "The authenticated Kismet Platform MCP workspace: curate catalogs, analyze journeys, run Insiders email, manage ads and audiences, configure outbound automations, and produce the client-facing Booking Channel & Group Performance report. Powered by the Kismet User MCP.",
+  "description": "Kismet for Operators — the authenticated workspace for running your Kismet business from your AI: curate catalogs, analyze guest journeys, generate demand, run Insiders email, manage ads and audiences, configure automations, and produce the client-facing Booking Channel & Group Performance report.",
   "version": "0.2.0",
   "author": {
     "name": "Kismet",
