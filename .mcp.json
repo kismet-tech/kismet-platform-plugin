@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "kismet-platform": {
+    "kismet-operators": {
       "type": "http",
       "url": "https://mcp.kismet.travel/user-mcp"
     }

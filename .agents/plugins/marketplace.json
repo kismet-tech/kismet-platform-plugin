@@ -1,0 +1,20 @@
+{
+  "name": "kismet-operators",
+  "interface": {
+    "displayName": "Kismet for Operators"
+  },
+  "plugins": [
+    {
+      "name": "kismet-operators",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
