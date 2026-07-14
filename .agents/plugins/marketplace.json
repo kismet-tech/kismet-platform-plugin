@@ -8,7 +8,7 @@
       "name": "kismet-operators",
       "source": {
         "source": "local",
-        "path": "./"
+        "path": "./plugins/kismet-operators"
       },
       "policy": {
         "installation": "AVAILABLE",
