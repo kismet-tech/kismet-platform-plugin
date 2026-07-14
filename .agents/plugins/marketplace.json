@@ -1,11 +1,11 @@
 {
-  "name": "kismet",
+  "name": "kismet-operators",
   "interface": {
     "displayName": "Kismet for Operators"
   },
   "plugins": [
     {
-      "name": "kismet-platform",
+      "name": "kismet-operators",
       "source": {
         "source": "local",
         "path": "./"

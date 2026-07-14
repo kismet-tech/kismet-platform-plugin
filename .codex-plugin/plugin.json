@@ -1,7 +1,7 @@
 {
-  "name": "kismet-platform",
+  "name": "kismet-operators",
   "version": "0.1.0+codex.20260712190534",
-  "description": "Kismet for Operators: run your Kismet business — catalogs, analytics, demand, advertising, Insiders email, and automations — from your AI.",
+  "description": "Kismet for Operators: run your Kismet business \u2014 catalogs, analytics, demand, advertising, Insiders email, and automations \u2014 from your AI.",
   "author": {
     "name": "Kismet"
   },
@@ -17,7 +17,7 @@
   "interface": {
     "displayName": "Kismet for Operators",
     "shortDescription": "Operate your Kismet business from your AI.",
-    "longDescription": "Kismet for Operators — the authenticated workspace for running your Kismet business from your AI: curate catalogs, analyze guest journeys, generate demand, run Insiders email, manage ads and audiences, and configure automations.",
+    "longDescription": "Kismet for Operators \u2014 the authenticated workspace for running your Kismet business from your AI: curate catalogs, analyze guest journeys, generate demand, run Insiders email, manage ads and audiences, and configure automations.",
     "developerName": "Kismet",
     "category": "Productivity",
     "capabilities": [
