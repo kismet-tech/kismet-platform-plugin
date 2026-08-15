@@ -1,0 +1,11 @@
+interface:
+  display_name: "Kismet Guest CRM"
+  short_description: "Find, understand, and note guests; build audiences"
+  default_prompt: "Use $kismet-guest-crm to show me my repeat guests and what they're worth."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "kismet-platform"
+      description: "Authenticated Kismet guest CRM/CDP"
+      transport: "streamable_http"
+      url: "https://mcp.kismet.travel/user-mcp"
