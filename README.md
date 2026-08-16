@@ -48,3 +48,14 @@ Questions or requests: [engineering@makekismet.com](mailto:engineering@makekisme
 
 Skill content in this repository is published automatically from Kismet's
 source repository; versions here always match what the Kismet platform serves.
+
+---
+
+## About this repository
+
+Skill content under `plugins/kismet-operators/skills/` is maintained in
+Kismet's internal source repository and published here by an automated sync
+(see the `.sync` stamp for provenance). Pull requests that edit skill files
+directly will be overwritten by the next sync — please
+[open an issue](../../issues) instead, and the Kismet team will land the
+change upstream.
