@@ -12,8 +12,8 @@
     {
       "name": "kismet-operators",
       "source": "./plugins/kismet-operators",
-      "description": "Kismet for Operators \u2014 the authenticated workspace for running your Kismet business from your AI: curate catalogs, analyze guest journeys, generate demand, run Insiders email, manage ads and audiences, and configure automations.",
-      "version": "0.1.0",
+      "description": "Kismet for Operators \u2014 the authenticated workspace for running your Kismet business from your AI: curate catalogs, analyze guest journeys, run the guest CRM (search guests, audiences, notes), generate demand, run Insiders email, manage ads and audiences, configure automations, and produce the client-facing Booking Channel & Group Performance report.",
+      "version": "0.3.0",
       "author": {
         "name": "Kismet",
         "email": "engineering@makekismet.com"
