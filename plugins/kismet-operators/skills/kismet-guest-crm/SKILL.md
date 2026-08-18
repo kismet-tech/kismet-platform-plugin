@@ -17,19 +17,25 @@ before interpreting results.
 
 ## The tools
 
-| Tool | What it does |
-| --- | --- |
-| `search_guests` | The guestbook query. Same rule grammar and same evaluator as the Audiences tab, so a count here always equals the screen. |
-| `get_guest` | One person's full record: addresses, trips, stats, live audience membership, notes. |
-| `add_guest_note` | Append an internal team note to a guest. |
-| `list_audiences` / `preview_audience` / `save_audience` / `update_audience` | The audience family — a search becomes a durable, rolling audience by saving the same filters. |
+| Tool                                                                        | What it does                                                                                                                                                                                                                                                                                                                    |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `search_guests`                                                             | The guestbook query. Same rule grammar and same evaluator as the Audiences tab, so a count here always equals the screen. Every result also carries **whole-match aggregates** (repeat rate, avg stays, observed lifetime value, channel mix, booker/companion overlap) — the set-level story.                                  |
+| `list_shoppers`                                                             | **Who is shopping us right now** — the demand side. Active journeys from the storefront and AI surfaces (ChatGPT, Claude) with funnel stage, estimated trip value from prices shown, homes compared, dates. Reads the same pipeline as the Guests page stage cards. Masked names; `get_guest` an identified shopper for detail. |
+| `get_guest`                                                                 | One person's full record: addresses, trips, stats, live audience membership, notes.                                                                                                                                                                                                                                             |
+| `add_guest_note`                                                            | Append an internal team note to a guest.                                                                                                                                                                                                                                                                                        |
+| `list_audiences` / `preview_audience` / `save_audience` / `update_audience` | The audience family — a search becomes a durable, rolling audience by saving the same filters.                                                                                                                                                                                                                                  |
 
 ## Workflow
 
 1. Establish the collection (`collection_slug`).
 2. Answer relationship questions with `search_guests` — see the recipes. Lead
    with the reach line (matched / mailable / ad-matchable): it tells the
-   manager what the result is worth before anyone reads rows.
+   manager what the result is worth before anyone reads rows. Then tell the
+   set-level story from `aggregates` — the rows are a truncated sample; **never
+   recompute repeat rate, lifetime value, or channel mix from them**.
+   Answer demand questions ("who is shopping us right now?", "what is in the
+   funnel this week?") with `list_shoppers` — it is the same pipeline the
+   Guests page stage cards read, so its counts match the screen too.
 3. Drill into one person with `get_guest` before drafting anything addressed
    to them. Check `audiences[]` on the result: `member: true, mailable: false`
    means a campaign would skip them — surface that, never work around it.
@@ -59,6 +65,15 @@ before interpreting results.
 - **Next stay is a fact, not a forecast.** `stats.nextStay` is a real future
   booking. Do not infer or promise predicted stay timing; the predictive
   layer is deliberately out of scope.
+- **Three kinds of value, never blended.** `list_shoppers` estimated trip value
+  is basket INTENT (prices a shopper was shown); `search_guests` lifetime value
+  is observed, booked RELATIONSHIP value; `stats.clv.ifReturnUsd` is a
+  conditional FORWARD range ("if they return"). Label each as what it is.
+- **Lapsing is the signal.** When a high-value guest reads `likelihood.modifier:
+'lapsing'`, that is the first thing to surface — it is the revenue leaking.
+  A `'returning_booked'` guest is a fact, not a target: serve them, don't
+  market to them. See [references/objects.md](references/objects.md) § Forward
+  value for the exact vocabulary.
 
 ## Email-connected agents
 

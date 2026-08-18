@@ -45,6 +45,34 @@ one captured at the WiFi splash.
   filter inputs — `minSpendCents: 500000` is $5,000).
 - `stats.nextStay` is a real future reservation. There is no predicted next
   stay anywhere in these tools; do not invent one.
+- Only **paying** stays count as stays anywhere (owner blocks and maintenance
+  holds sync as $0-payout reservations and are excluded from every count).
+
+## Forward value — `stats.clv` on `get_guest`, `stats.clv` on audiences
+
+`get_guest` may carry `stats.clv` (null when the collection's history is too
+thin to say anything — say nothing). It is **not a prediction of what a guest
+will spend**. It is a reading of the operator's OWN booking history for guests
+like this one, in three parts:
+
+- `likelihood` — `{ band: strong | moderate | low, modifier, label }`. The band
+  is the share of guests in the same cell (same stay count, same first channel)
+  who booked again within a year. `modifier: 'lapsing'` means the band was
+  lowered because the last stay is over 14 months old and nothing is booked.
+  `modifier: 'returning_booked'` means a future stay is on file — that is a
+  **fact**, not a probability; say "returning" and stop.
+- `ifReturnUsd` — `{ low, high }`: **if** this guest returns, a next-year stay
+  is worth this range — the guest's OWN average stay scaled by what returning
+  guests in their cell spent. Always say "if they return"; never drop the if.
+- `basis` — `'collection'` (their own history) or `'portfolio'` (their sample
+  was too thin, so the cross-portfolio rate was used — say so).
+
+**There is no per-guest expected value in the payload, on purpose.** Probability
+× value on one person is a floor dragged down by everyone who never returns; it
+reads as an insult next to their history. Do not compute one. The set-level
+expectation exists only on an **audience** (`clv.expectedNextYearCents` and the
+`ifTwentyPctReturnCents` scenario) where it is honest and large — say "expected"
+and "if 20% return", never "will earn".
 
 ## Audience membership — member vs mailable
 
@@ -58,14 +86,14 @@ They differ on purpose. A member is not mailable when they unsubscribed, or
 when their enrollment came from booking alone (auto-enrollment is not
 marketing consent). The `reason` field is a closed vocabulary:
 
-| reason | meaning | what to do |
-| --- | --- | --- |
-| `in_rule` | matches, consented, reachable | a real target |
-| `opted_out` | in the audience, but a send would skip them | never present as a target; do not work around it |
-| `not_in_rule` | the rule excludes them (e.g. they rebooked) | often good news — say why |
-| `not_consented` | no active membership | capture/consent opportunity |
-| `not_in_list` | curated list they were never added to | add via the audience tools if appropriate |
-| `vendor_evaluated` | pixel audience owned by the ad platform | we cannot answer for it; don't claim either way |
+| reason             | meaning                                     | what to do                                       |
+| ------------------ | ------------------------------------------- | ------------------------------------------------ |
+| `in_rule`          | matches, consented, reachable               | a real target                                    |
+| `opted_out`        | in the audience, but a send would skip them | never present as a target; do not work around it |
+| `not_in_rule`      | the rule excludes them (e.g. they rebooked) | often good news — say why                        |
+| `not_consented`    | no active membership                        | capture/consent opportunity                      |
+| `not_in_list`      | curated list they were never added to       | add via the audience tools if appropriate        |
+| `vendor_evaluated` | pixel audience owned by the ad platform     | we cannot answer for it; don't claim either way  |
 
 The distinction between `not_in_rule` and `opted_out` matters: "out of
 Rewarming because they already rebooked" is a success story; "unsubscribed"
@@ -86,7 +114,7 @@ the operational fact.
 
 ## Consent posture, in one paragraph
 
-Enrollment is consent to be *known*; marketing consent is separate and
+Enrollment is consent to be _known_; marketing consent is separate and
 explicit; auto-enrollment by booking is neither. Saving an audience contacts
 nobody. Sends resolve consent downstream and drop non-mailable members
 silently — which is why these tools surface `mailable` up front: so you stop
