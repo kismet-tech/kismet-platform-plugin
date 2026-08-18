@@ -22,7 +22,7 @@ before interpreting results.
 | `search_guests`                                                             | The guestbook query. Same rule grammar and same evaluator as the Audiences tab, so a count here always equals the screen. Every result also carries **whole-match aggregates** (repeat rate, avg stays, observed lifetime value, channel mix, booker/companion overlap) — the set-level story.                                  |
 | `list_shoppers`                                                             | **Who is shopping us right now** — the demand side. Active journeys from the storefront and AI surfaces (ChatGPT, Claude) with funnel stage, estimated trip value from prices shown, homes compared, dates. Reads the same pipeline as the Guests page stage cards. Masked names; `get_guest` an identified shopper for detail. |
 | `get_guest`                                                                 | One person's full record: addresses, trips, stats, live audience membership, notes.                                                                                                                                                                                                                                             |
-| `add_guest_note`                                                            | Append an internal team note to a guest.                                                                                                                                                                                                                                                                                        |
+| `add_guest_note`                                                            | Append a team note to a guest — optionally scoped to one trip (`reservation_id` from `get_guest.trips`) — with `usage`: `STAFF` (default; operations only, never a targeting input) or `MARKETING` (the author says marketing may use it). Ask before choosing MARKETING; never infer it.                                        |
 | `list_audiences` / `preview_audience` / `save_audience` / `update_audience` | The audience family — a search becomes a durable, rolling audience by saving the same filters.                                                                                                                                                                                                                                  |
 
 ## Workflow
@@ -42,7 +42,9 @@ before interpreting results.
 4. To act on a search repeatedly, save it: `save_audience` with the same
    filters (rolling windows keep it evergreen). Preview → confirm, per the
    audience tools' own two-step.
-5. Record what you learned with `add_guest_note` — notes are internal to the
+5. Record what you learned with `add_guest_note` — scope it to the trip when it
+   is about one stay (`reservation_id`), and leave `usage` at STAFF unless the
+   operator explicitly says marketing may use it. Notes are internal to the
    team, never guest-facing.
 
 ## Rules that are not optional
@@ -74,6 +76,13 @@ before interpreting results.
   A `'returning_booked'` guest is a fact, not a target: serve them, don't
   market to them. See [references/objects.md](references/objects.md) § Forward
   value for the exact vocabulary.
+- **The verdict is a filter.** `clvBand` (`likely` / `possible` / `low`) and
+  `clvModifier` (`lapsing` / `returning_booked` / `none`) work in
+  `search_guests`, `preview_audience`, `save_audience`, `update_audience`.
+  `{ minSpendCents: 500000, clvModifier: ["lapsing"] }` IS the win-back
+  audience — rolling by construction, scored by the same scorer as the
+  guestbook chip. Add `"none"` to keep a send away from people who already
+  booked; never a second model.
 
 ## Email-connected agents
 
@@ -85,8 +94,5 @@ for, with consent and unsubscribe handled by the platform. After any
 meaningful exchange, record the outcome with `add_guest_note`.
 
 ## Coming, not yet available
-
-- **Trip-scoped notes** — today a note lives on the person; name the stay in
-  the note text ("Aug 2026, Sunny Dunes: …").
 - **Travel-party reads over MCP** — companions are visible on the guest page
   but not yet returned by `get_guest`.

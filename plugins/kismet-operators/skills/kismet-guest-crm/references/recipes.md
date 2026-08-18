@@ -139,12 +139,26 @@ right now — the highest-value moment the CDP can name.
 ## Forward value — the two questions marketers actually ask
 
 **Who is worth winning back?** High observed value + lapsing is the money that
-is leaking. Search for lifetime value with no recent stay, then read the top
-rows one at a time:
+is leaking. The model's own verdict is a filter now — ask for it directly:
 
 ```json
-{ "filters": { "minSpendCents": 500000, "notBookedSince": true }, "sort": "spend", "limit": 15 }
+{ "filters": { "minSpendCents": 500000, "clvModifier": ["lapsing"] }, "sort": "spend", "limit": 15 }
 ```
+
+`clvModifier: ["lapsing"]` = last paying stay >14 months ago and nothing booked
+(rolling by construction — nothing to drift). `clvBand: ["likely","possible","low"]`
+filters on the band after that modifier. Both are scored per row by the SAME
+scorer as the guestbook chip and `get_guest.stats.clv`, so a saved "Lapsing
+whales" audience can never disagree with the chips on its rows. Rows the model
+cannot score match no band. To make it a standing audience:
+
+```json
+{ "name": "Lapsing whales", "type": "DYNAMIC",
+  "filters": { "minSpendCents": 500000, "clvModifier": ["lapsing"] } }
+```
+
+Exclude people who are already coming back from any win-back send with
+`clvModifier: ["lapsing","none"]` (i.e. not `returning_booked`).
 
 then `get_guest` on the top rows and lead with `stats.clv.likelihood` (look for
 `modifier: 'lapsing'`) and `stats.clv.ifReturnUsd`. Present as: _"$36k
