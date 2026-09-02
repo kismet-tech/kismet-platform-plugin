@@ -153,8 +153,11 @@ whales" audience can never disagree with the chips on its rows. Rows the model
 cannot score match no band. To make it a standing audience:
 
 ```json
-{ "name": "Lapsing whales", "type": "DYNAMIC",
-  "filters": { "minSpendCents": 500000, "clvModifier": ["lapsing"] } }
+{
+    "name": "Lapsing whales",
+    "type": "DYNAMIC",
+    "filters": { "minSpendCents": 500000, "clvModifier": ["lapsing"] }
+}
 ```
 
 Exclude people who are already coming back from any win-back send with
@@ -173,6 +176,202 @@ This is how a campaign gets sized before it is sent.
 
 **Do not** rank individual guests by a computed expected value (there isn't
 one), and do not describe `ifReturnUsd` as what they will spend.
+
+## Thin slices — timing habit + live signals
+
+The broad recipes above find the SET; these find the MOMENT. Three predicates
+make them possible: `minLeadDays`/`maxLeadDays` (how far ahead this guest
+books, per qualifying stay), `shopperDays`/`shopperStages` (an active journey
+now — the audience-composable form of `list_shoppers`), and
+`emailEngagedDays` (opened/clicked a campaign email recently). All rolling by
+construction.
+
+**Long-lead planners whose booking window is opening.** The canonical thin
+slice. A guest who books 180+ days ahead does their booking work around the
+anniversary of their LAST booking — the rewarming nudge lands then, not in
+spring. (Real case: a guest booked Aug 31 for the following July — 322 days of
+lead, committed two weeks after checking out. His window is now, every year.)
+
+```json
+{
+    "name": "Long-lead planners due to book",
+    "type": "DYNAMIC",
+    "filters": {
+        "minLeadDays": 180,
+        "windows": [
+            { "kind": "has", "event": "booked", "window": { "fromDays": -420, "toDays": -300 } },
+            { "kind": "none", "event": "booked", "window": { "fromDays": -300, "toDays": 0 } }
+        ],
+        "notBookedSince": true
+    }
+}
+```
+
+Read it as: books far ahead AND last booked roughly a year ago AND nothing
+since AND nothing on the books. The `windows` pair times the send; the lead
+band explains WHY now is the moment.
+
+**Spontaneous bookers — the gap-fill audience.** Booked within 30 days of
+check-in at least once; these are the people a last-minute-opening flash offer
+actually converts. Add a season window to match the gap you are filling.
+
+```json
+{ "filters": { "maxLeadDays": 30, "minStays": 1 }, "sort": "spend" }
+```
+
+**Repeat guests shopping you RIGHT NOW.** The highest-value moment the CDP can
+name, as a standing audience instead of a manual `list_shoppers` cross-check:
+
+```json
+{
+    "name": "Returning guests in the funnel",
+    "type": "DYNAMIC",
+    "filters": { "minStays": 2, "shopperDays": 7 }
+}
+```
+
+Narrow to serious shoppers with `"shopperStages": ["planning", "intent"]`.
+An identified shopper with stay history is warm on BOTH axes — mention the
+homes they have stayed in, not a generic pitch.
+
+**Warm but not booked.** Opened or clicked a campaign email in the last two
+weeks and still has nothing on the books — the follow-up audience, and the
+honest measure of whether a campaign moved anyone:
+
+```json
+{ "filters": { "emailEngagedDays": 14, "notBookedSince": true } }
+```
+
+**Composing the axes** is the point. "Lapsing whales who opened the win-back
+email but still haven't booked" is one rule:
+`{ "minSpendCents": 500000, "clvModifier": ["lapsing"], "emailEngagedDays": 14, "notBookedSince": true }`
+— value × model verdict × live signal × timing, each predicate from a
+different part of the grammar, all AND.
+
+## An audience is a set of rules — build with PARTS
+
+Think of every audience as a stack of small, legible rules ANDed together.
+The job most thin slices exist for: **when someone ENTERS the audience,
+something happens** (a perk drops into their account, an email lands) to fill
+specific dates. Design the rule so entry IS the moment.
+
+**Always decompose into named `parts`** when a rule has more than one idea.
+Each part carries a `name` and a `description` YOU write in clear language a
+marketer understands — the description becomes the hover card on the
+audience chip, and the operator toggles each part on/off without touching
+the others. One flat filter blob is a black box; three named parts are a
+story:
+
+```json
+{
+    "name": "New Year's regulars worth a nudge",
+    "type": "DYNAMIC",
+    "parts": [
+        {
+            "name": "Stayed over New Year's",
+            "description": "Their paying stay covered the New Year holiday week last season.",
+            "filters": {
+                "windows": [
+                    {
+                        "kind": "has",
+                        "event": "stay",
+                        "window": { "from": "2025-12-26", "to": "2026-01-04" }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "In their booking window",
+            "description": "They booked that trip roughly this week last year, so this is when they decide. Rolls weekly - a fresh cohort enters every week.",
+            "filters": {
+                "windows": [
+                    {
+                        "kind": "has",
+                        "event": "booked",
+                        "window": { "fromDays": -378, "toDays": -364 }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Not rebooked yet",
+            "description": "Nothing booked since, and nothing on the books - the nudge still has a job to do.",
+            "filters": { "notBookedSince": true }
+        }
+    ]
+}
+```
+
+Rules for parts: 2-4 small parts beat one big one; every description is 1-3
+plain sentences (what it matches, why it is here) with NO counts (they go
+stale — the surface shows live numbers); `preview_audience`/`save_audience`
+report each part's standalone `matchedAlone` count next to the combined
+match, so you can tell the operator which part does the narrowing. Toggle
+without resending: `update_audience` with `toggle_parts: {"p2": false}`
+parks a part (kept in the rule, skipped at evaluation — never delete a part
+to disable it). One caution: parts intersect as SEPARATE evaluations, so
+two parts may be satisfied by different reservations; keep criteria that
+must hold on the SAME stay inside one part (or one windows clause with
+`match`/`booked`).
+
+**Personal booking-anniversary (the New Year's pattern).** A `stay` clause
+can carry a second `booked` window on the SAME reservation. Fixed stay dates
+
+- a rolling booked window = each week, exactly the guests who booked that
+  week last year enter the audience — so an always-on send reaches every guest
+  in their own booking week. Shift the offsets back a week to be proactive:
+
+```json
+{
+    "name": "New Year's 2026 — book-your-week nudge",
+    "type": "DYNAMIC",
+    "filters": {
+        "windows": [
+            {
+                "kind": "has",
+                "event": "stay",
+                "window": { "from": "2025-12-26", "to": "2026-01-04" },
+                "booked": { "fromDays": -378, "toDays": -364 }
+            },
+            { "kind": "none", "event": "booked", "window": { "fromDays": -364, "toDays": 0 } }
+        ],
+        "notBookedSince": true
+    }
+}
+```
+
+Read it as: stayed over New Year's last season, AND that stay was booked
+roughly this week last year (minus one week, to fire early), AND nothing
+booked since. Membership rolls weekly; nobody gets the send twice because
+they exit the window as it moves.
+
+## Custom filters — the SQL escape hatch
+
+When the grammar cannot say the slice, create a named, DESCRIBED, SQL-backed
+rule with `create_custom_filter` and reference it from any audience via
+`filters.customFilterIds`. Rules of the road:
+
+- **Grammar first.** Check the fields and `windows` clauses above before
+  writing SQL; check `list_custom_filters` before writing a duplicate.
+- **Description is the product.** It renders on the audience chip; write 1-3
+  sentences an operator understands. No counts (they go stale).
+- The SQL is ONE `SELECT`/`WITH` returning `guest_id` (vr_guests.id), scoped
+  by `$1` (collection id), and mirrors the qualifying-stay hygiene
+  (`status IN ('confirmed','checked_in','checked_out') AND
+host_payout_cents > 0 AND NOT is_sandbox`) unless the rule deliberately
+  reads other rows. It executes read-only with a timeout and can only NARROW
+  the audience — the evaluator intersects its matches with the other rules.
+
+Example — "families who stayed over a school holiday with children in the
+party":
+
+```json
+{
+    "name": "School-holiday families",
+    "description": "Guests whose paying stay overlapped a school-holiday week and whose party included children — the audience for next year's holiday pre-open.",
+    "sql": "SELECT DISTINCT g.id AS guest_id FROM vr_guests g JOIN vr_reservations r ON r.guest_id = g.id WHERE g.collection_id = $1::uuid AND r.status IN ('confirmed','checked_in','checked_out') AND r.host_payout_cents > 0 AND NOT r.is_sandbox AND r.children_count > 0 AND (r.check_in, r.check_out) OVERLAPS (DATE '2026-02-14', DATE '2026-02-22')"
+}
+```
 
 ## Reading the result
 
