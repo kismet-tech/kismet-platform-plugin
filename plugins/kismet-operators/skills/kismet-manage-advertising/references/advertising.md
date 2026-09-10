@@ -3,7 +3,8 @@
 This skill covers paid media. Do not treat all Google, ChatGPT, or Meta demand as advertising: each platform also has an organic lane measured through traffic, session, journey, and reservation evidence.
 
 - Reads: `list_ad_campaigns`, `get_ads_attribution`, `get_ads_performance`, `get_ads_search_terms`.
-- Google writes: `create_ad_campaign`, `update_ad_campaign`, `archive_ad_campaign`.
+- Google writes: `create_ad_campaign`, `update_ad_campaign`, `archive_ad_campaign`, `adopt_ad_campaign`.
+- Client-built campaigns (`managedBy: client`, numeric Google id) accept only `daily_budget_usd` in `update_ad_campaign`. To manage every field, take the campaign over with `adopt_ad_campaign` (preview, then `confirm: true`); nothing on Google changes at adoption, the campaign gains a Kismet uuid and reads as Kismet-optimized since that date. Never pause a client campaign as part of a takeover; pausing and enabling stay separate, deliberate calls.
 - New campaigns are paused by construction. Enabling starts spend and is billing-gated.
 - Destinations are server-derived from published Kismet groups; do not provide arbitrary final URLs.
 - Budget floors, clamps, aggregate caps, rate limits, idempotency, and audit records are enforced server-side. Surface preview adjustments clearly.
