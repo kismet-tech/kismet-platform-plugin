@@ -1,7 +1,7 @@
 {
-  "name": "kismet-operators",
+  "name": "kismet-platform",
   "interface": {
-    "displayName": "Kismet for Operators"
+    "displayName": "Kismet Platform"
   },
   "plugins": [
     {

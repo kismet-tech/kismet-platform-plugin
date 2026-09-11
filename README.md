@@ -1,11 +1,22 @@
-# Kismet for Operators
+# Kismet Platform Plugins
 
-Operate your [Kismet](https://kismet.travel) portfolio from your AI assistant.
-This plugin works in **Claude** (claude.ai and Claude Code) and **ChatGPT /
-Codex**: installing it configures the authenticated Kismet
-connection and adds task-ready skills for the day-to-day jobs of running
-direct bookings — so you can ask for outcomes ("fill my empty August nights")
-instead of driving tools one call at a time.
+The official plugin marketplace for building on and operating
+[Kismet](https://kismet.travel). It contains two deliberately separate
+plugins:
+
+- `kismet-operators` connects authenticated collection operators to Kismet.
+- `kismet-developer` gives coding agents public, build-time guidance for the
+  Developer API, SDK, Fixtures, and integration validation.
+
+Both plugins work in Claude and ChatGPT / Codex.
+
+## Kismet for Operators
+
+Operate your Kismet portfolio from your AI assistant. Installing the operator
+plugin configures the authenticated Kismet connection and adds task-ready
+skills for the day-to-day jobs of running direct bookings, so you can ask for
+outcomes ("fill my empty August nights") instead of driving tools one call at
+a time.
 
 ## What you get
 
@@ -26,13 +37,14 @@ New skills land here automatically as Kismet ships them.
 
 ## Install
 
-- **claude.ai** — Settings → Directory → Plugins → **Add marketplace** →
-  `kismet-tech/kismet-platform-plugin`, then install **kismet-platform**.
-- **Claude Code** — `/plugin marketplace add kismet-tech/kismet-platform-plugin`,
-  then `/plugin install kismet-platform@kismet`.
-- **ChatGPT / Codex** — add this repository as a plugin marketplace and
-  install **kismet-platform**. You'll be prompted to authenticate with the
-  Kismet the first time a skill needs your data.
+- **claude.ai**: Settings → Directory → Plugins → **Add marketplace** →
+  `kismet-tech/kismet-platform-plugin`, then install `kismet-operators`.
+- **Claude Code**: `/plugin marketplace add kismet-tech/kismet-platform-plugin`,
+  then `/plugin install kismet-operators@kismet-platform`.
+- **ChatGPT / Codex**:
+  `codex plugin marketplace add kismet-tech/kismet-platform-plugin`, then
+  `codex plugin add kismet-operators@kismet-platform`. You will be prompted to
+  authenticate the first time the plugin needs collection data.
 
 ## Safety model
 
@@ -57,6 +69,17 @@ Developer API and Fixture contracts, and supplies workflows for SDK sites,
 semantic search, branded guest accounts, TEST booking, fixture-backed builds,
 and pre-deployment validation. It contains no developer credential and does not
 expose runtime guest data.
+
+Install it in Codex with:
+
+```sh
+codex plugin marketplace add kismet-tech/kismet-platform-plugin
+codex plugin add kismet-developer@kismet-platform
+```
+
+The Developer MCP is public and read-only. Installing this plugin does not
+require a Kismet account or a Developer API credential. Credentials belong in
+the application being built, never in the plugin configuration.
 
 ---
 
