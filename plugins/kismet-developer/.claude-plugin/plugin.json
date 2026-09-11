@@ -1,7 +1,7 @@
 {
   "name": "kismet-developer",
   "description": "Build, validate, and ship branded Kismet sites with the Developer API, TypeScript SDK, Fixtures, and agent-readable contracts.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "Kismet",
     "email": "engineering@makekismet.com"
