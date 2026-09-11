@@ -23,3 +23,34 @@ codex plugin add kismet-developer@kismet-platform
 Open a new task after installation and ask Codex to use Kismet Developer to
 plan or validate an integration. The build-time MCP is public and read-only;
 no Kismet credential is required to install or use the plugin.
+
+## Install in Claude
+
+In Claude, open **Customize → Plugins → Personal plugins → + → Add
+marketplace**, add `https://github.com/kismet-tech/kismet-platform-plugin`,
+then install **Kismet Developer**.
+
+In Claude Code, run:
+
+```text
+/plugin marketplace add kismet-tech/kismet-platform-plugin
+/plugin install kismet-developer@kismet-platform
+```
+
+Open a new conversation after installation so Claude loads the plugin skills
+and the Kismet Developer MCP.
+
+## Connect from Lovable
+
+Lovable connects to the Developer MCP rather than installing the repository
+plugin. Open **Connectors → Chat connectors**, add a custom MCP server named
+`Kismet Developer`, and enter:
+
+```text
+https://mcp.kismet.travel/developer-mcp
+```
+
+The connection provides the canonical MCP tools, recipes, prompts, and
+resources. It does not install the plugin's six local workflow skills, so ask
+Lovable to call `list_recipes` or `plan_integration` before it starts changing
+the application.

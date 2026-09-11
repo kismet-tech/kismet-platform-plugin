@@ -8,7 +8,8 @@ plugins:
 - `kismet-developer` gives coding agents public, build-time guidance for the
   Developer API, SDK, Fixtures, and integration validation.
 
-Both plugins work in Claude and ChatGPT / Codex.
+Both plugins work in Claude and Codex. Lovable connects directly to the same
+Developer MCP because it does not install repository-backed plugin bundles.
 
 ## Kismet for Operators
 
@@ -70,12 +71,41 @@ semantic search, branded guest accounts, TEST booking, fixture-backed builds,
 and pre-deployment validation. It contains no developer credential and does not
 expose runtime guest data.
 
-Install it in Codex with:
+### Codex
+
+Install the full plugin from the official marketplace:
 
 ```sh
 codex plugin marketplace add kismet-tech/kismet-platform-plugin
 codex plugin add kismet-developer@kismet-platform
 ```
+
+### Claude
+
+In Claude, open **Customize → Plugins → Personal plugins → + → Add
+marketplace**, add `https://github.com/kismet-tech/kismet-platform-plugin`,
+then install **Kismet Developer**.
+
+In Claude Code, run:
+
+```text
+/plugin marketplace add kismet-tech/kismet-platform-plugin
+/plugin install kismet-developer@kismet-platform
+```
+
+### Lovable
+
+Lovable uses the public MCP directly. Open **Connectors → Chat connectors**,
+add a custom MCP server named `Kismet Developer`, and use:
+
+```text
+https://mcp.kismet.travel/developer-mcp
+```
+
+The Lovable connection includes the canonical tools, recipes, prompts, and
+resources exposed by the MCP. The six local workflow skills bundled with the
+Codex and Claude plugin are not installed in Lovable, so begin by asking the
+agent to call `list_recipes` or `plan_integration`.
 
 The Developer MCP is public and read-only. Installing this plugin does not
 require a Kismet account or a Developer API credential. Credentials belong in
