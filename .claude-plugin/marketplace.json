@@ -18,6 +18,16 @@
         "name": "Kismet",
         "email": "engineering@makekismet.com"
       }
+    },
+    {
+      "name": "kismet-developer",
+      "source": "./plugins/kismet-developer",
+      "description": "Kismet for Developers: build and validate branded sites with the Developer API, SDK, Fixtures, and agent-readable contracts.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Kismet",
+        "email": "engineering@makekismet.com"
+      }
     }
   ]
 }

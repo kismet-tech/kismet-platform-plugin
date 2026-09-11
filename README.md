@@ -49,13 +49,21 @@ Questions or requests: [engineering@makekismet.com](mailto:engineering@makekisme
 Skill content in this repository is published automatically from Kismet's
 source repository; versions here always match what the Kismet platform serves.
 
+## Kismet for Developers
+
+The same marketplace also contains `kismet-developer`, a public build-time
+plugin for coding agents. It connects to the Developer MCP, reads the canonical
+Developer API and Fixture contracts, and supplies workflows for SDK sites,
+semantic search, branded guest accounts, TEST booking, fixture-backed builds,
+and pre-deployment validation. It contains no developer credential and does not
+expose runtime guest data.
+
 ---
 
 ## About this repository
 
 Skill content under `plugins/kismet-operators/skills/` is maintained in
 Kismet's internal source repository and published here by an automated sync
-(see the `.sync` stamp for provenance). Pull requests that edit skill files
-directly will be overwritten by the next sync — please
-[open an issue](../../issues) instead, and the Kismet team will land the
-change upstream.
+(see the `.sync` stamp for provenance). Pull requests that edit operator skill
+files directly will be overwritten by the next sync. The developer plugin is
+reviewed against the canonical Developer MCP recipe and operation registry.
