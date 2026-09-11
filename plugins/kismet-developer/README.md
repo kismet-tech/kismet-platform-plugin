@@ -12,3 +12,14 @@ The plugin connects to the public, build-time Developer MCP. It can read canonic
 4. Run `validate-kismet-integration` before deployment.
 
 The MCP recipe registry is canonical. Skills fetch recipes and operation references at use time so package guidance cannot silently drift from the shipped API.
+
+## Install in Codex
+
+```sh
+codex plugin marketplace add kismet-tech/kismet-platform-plugin
+codex plugin add kismet-developer@kismet-platform
+```
+
+Open a new task after installation and ask Codex to use Kismet Developer to
+plan or validate an integration. The build-time MCP is public and read-only;
+no Kismet credential is required to install or use the plugin.

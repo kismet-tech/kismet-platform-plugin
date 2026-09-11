@@ -1,12 +1,12 @@
 {
-  "name": "kismet-operators",
+  "name": "kismet-platform",
   "owner": {
     "name": "Kismet",
     "email": "engineering@makekismet.com"
   },
   "metadata": {
-    "description": "Official Kismet plugin marketplace for property managers and hotel operators. Skill content is mirrored from kismet-infrastructure skills-src (the source of truth) by CI.",
-    "version": "0.1.0"
+    "description": "Official Kismet plugin marketplace for operators and developers. Operator skill content is mirrored from kismet-infrastructure skills-src by CI; developer guidance is grounded in the public Developer MCP.",
+    "version": "0.2.0"
   },
   "plugins": [
     {
