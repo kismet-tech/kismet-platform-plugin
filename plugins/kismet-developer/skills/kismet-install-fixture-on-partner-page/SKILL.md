@@ -26,7 +26,7 @@ One rule per page type. Shape:
 
 ```json
 {
-  "match": "/listing/*",
+  "match": "^/listing/",
   "element": "property-detail",
   "anchor": ".bubble-element.Group.cmaMly",
   "position": "replace",
@@ -38,7 +38,7 @@ One rule per page type. Shape:
 }
 ```
 
-- `match`: a path pattern, an exact path or a prefix ending in `*`, starting with `/`, only `[A-Za-z0-9/_\-.*%]`, 1 to 200 characters.
+- `match`: a regular expression tested against the request path, 1 to 200 characters, must compile with `new RegExp`. `^/listing/` matches every listing page; `^/destinations/philadelphia$` matches one page. The worker compiles it with `new RegExp`, so a bare `/listing/*` would be a regex, not a glob.
 - `element`: one of the fixture element ids the worker knows: `property-detail`, `results-page`, `checkout-panel`, `booking-cta`, `rate-calendar`, `search-bar`.
 - `anchor`: the CSS selector from step 1, 1 to 300 characters, no `<`, `{`, or `}`.
 - `position`: `replace` for a body swap (the anchor is hidden through an injected stylesheet, not an inline style, because Bubble rewrites inline styles on every layout pass); `before` or `after` to insert next to the anchor and keep it; `prepend` or `append` to insert inside it.
