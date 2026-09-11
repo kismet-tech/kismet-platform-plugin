@@ -68,7 +68,8 @@ The same marketplace also contains `kismet-developer`, a public build-time
 plugin for coding agents. It connects to the Developer MCP, reads the canonical
 Developer API and Fixture contracts, and supplies workflows for SDK sites,
 semantic search, branded guest accounts, TEST booking, fixture-backed builds,
-and pre-deployment validation. It contains no developer credential and does not
+partner-page fixture installs through the staging proxy, and pre-deployment
+validation. It contains no developer credential and does not
 expose runtime guest data.
 
 ### Codex
@@ -103,7 +104,7 @@ https://mcp.kismet.travel/developer-mcp
 ```
 
 The Lovable connection includes the canonical tools, recipes, prompts, and
-resources exposed by the MCP. The six local workflow skills bundled with the
+resources exposed by the MCP. The nine local workflow skills bundled with the
 Codex and Claude plugin are not installed in Lovable, so begin by asking the
 agent to call `list_recipes` or `plan_integration`.
 
