@@ -13,6 +13,7 @@ The plugin connects to the public, build-time Developer MCP. It can read canonic
 5. Use `kismet-staging-proxy-setup` to stand up a staging proxy for a partner's existing site before the first fixture install.
 6. Use `kismet-install-fixture-on-partner-page` to mount a fixture into a partner page with worker rules and theme CSS, then publish.
 7. Use `kismet-smoke-fixture-install` to check a fixture install in the browser and produce the pass or fail report before publishing.
+8. Use `kismet-smoke-edge-tracking` to walk a guest journey on the staging host and prove every tracking write by session id before the edge worker reaches a production route.
 
 The MCP recipe registry is canonical. Skills fetch recipes and operation references at use time so package guidance cannot silently drift from the shipped API.
 
@@ -54,6 +55,6 @@ https://mcp.kismet.travel/developer-mcp
 ```
 
 The connection provides the canonical MCP tools, recipes, prompts, and
-resources. It does not install the plugin's nine local workflow skills, so ask
+resources. It does not install the plugin's ten local workflow skills, so ask
 Lovable to call `list_recipes` or `plan_integration` before it starts changing
 the application.

@@ -104,7 +104,7 @@ https://mcp.kismet.travel/developer-mcp
 ```
 
 The Lovable connection includes the canonical tools, recipes, prompts, and
-resources exposed by the MCP. The nine local workflow skills bundled with the
+resources exposed by the MCP. The ten local workflow skills bundled with the
 Codex and Claude plugin are not installed in Lovable, so begin by asking the
 agent to call `list_recipes` or `plan_integration`.
 
