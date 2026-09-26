@@ -34,6 +34,13 @@ mapping work below.
    and edited by the authenticated manager editor. Reference catalog facts
    by ID; keep inventory, prices, membership and account flows in their
    existing systems. Do not choose a new CMS vendor as a side effect.
+   Include staging-domain content preview in the contract: View published /
+   Preview changes should select a pinned baseline or reviewed draft release
+   in the real site renderer. Editors can save and share a scoped preview
+   without changing production. Preview access and caches stay isolated;
+   publication promotes the exact reviewed revisions after conflict checks.
+   Content preview is separate from TEST/LIVE transaction credentials and
+   remains planned until its authorization and delivery operations ship.
 5. Only invoke operations actually exposed and authorized for the destination.
    `plan_integration` and `validate_integration` are not evidence of an
    executable import when this recipe is planned. Do not invent CMS methods
