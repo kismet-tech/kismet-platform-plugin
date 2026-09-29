@@ -95,6 +95,11 @@ class InventoryTests(unittest.TestCase):
         self.assertEqual(before["sourceKey"], after["sourceKey"])
         self.assertNotEqual(before["sourceSha256"], after["sourceSha256"])
 
+    def test_mixed_public_and_private_snapshots_cannot_resurrect_a_page(self):
+        for first, second in (("publish", "private"), ("private", "publish")):
+            with self.subTest(first=first), self.assertRaisesRegex(ValueError, "Conflicting record scope"):
+                self.run_inventory(post(1, status=first) + post(1, status=second))
+
     def test_rejects_wrong_site_entities_and_dependency_types(self):
         self.path.write_text(wxr(post(1)), encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "differs"):

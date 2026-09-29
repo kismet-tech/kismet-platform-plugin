@@ -65,7 +65,7 @@ def normalize(paths, source_site, post_types=("page", "post"), meta_keys=()):
     site = site_identity(source_site)
     if set(post_types) & {"attachment", "revision", "nav_menu_item", "wp_navigation", "wp_block"}:
         raise ValueError("Dependencies must not be selected as editorial page types")
-    records, attachments, source_files = {}, {}, []
+    records, attachments, source_files, seen_scopes = {}, {}, [], {}
     excluded, duplicate_count = Counter(), 0
     for path in paths:
         channel, wp, exported_site, file_hash = parse_file(path)
@@ -76,6 +76,12 @@ def normalize(paths, source_site, post_types=("page", "post"), meta_keys=()):
             kind, status = value(item, wp + "post_type"), value(item, wp + "status")
             protected = bool(value(item, wp + "post_password"))
             is_attachment = kind == "attachment"
+            source_id = value(item, wp + "post_id")
+            scope = (kind, status, protected)
+            if re.fullmatch(r"[1-9][0-9]*", source_id):
+                if source_id in seen_scopes and seen_scopes[source_id] != scope:
+                    raise ValueError(f"Conflicting record scope for WordPress post ID {source_id}; recapture one snapshot")
+                seen_scopes[source_id] = scope
             if protected:
                 excluded["password_protected"] += 1
                 continue
@@ -85,7 +91,6 @@ def normalize(paths, source_site, post_types=("page", "post"), meta_keys=()):
             if (is_attachment and status not in ("inherit", "publish")) or (not is_attachment and status != "publish"):
                 excluded["non_published"] += 1
                 continue
-            source_id = value(item, wp + "post_id")
             if not re.fullmatch(r"[1-9][0-9]*", source_id):
                 raise ValueError("Selected record has no valid WordPress post ID")
             meta = metadata(item, wp)
