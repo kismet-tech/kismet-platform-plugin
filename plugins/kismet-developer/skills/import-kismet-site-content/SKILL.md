@@ -10,9 +10,17 @@ Read [../../references/contract-boundaries.md](../../references/contract-boundar
 Fetch the canonical Developer MCP recipe with `get_recipe` using
 `id: "site-content-migration"`, or read
 `kismet://recipes/site-content-migration`. Read its status before acting.
-The full draft-import/editor workflow is **planned** until its authoring
-operations ship. This does not prevent the read-only inventory and local
-mapping work below.
+Check each phase against the current deployed operations: a shipped generic
+CMS draft writer does not imply support for canonical Articles or fixed-route
+bindings. An unavailable recipe does not prevent the read-only inventory and
+local mapping work below, but is not permission to substitute another writer.
+
+For WordPress with authorized SSH/WP-CLI or a supplied WXR export, read
+[WordPress source capture](references/wordpress-source.md). Prefer structured
+source content plus rendered-page comparisons. The bundled
+`scripts/wordpress_inventory.py` converts local WXR files into a private,
+review-only inventory; it does not connect to a server or import into Kismet.
+For Bubble or crawl-only sources, follow the generic phases below.
 
 1. Reuse the task's existing captures and decisions. Establish source domains,
    target collection, locale, destination and content authorities. Call
@@ -40,7 +48,7 @@ mapping work below.
    without changing production. Preview access and caches stay isolated;
    publication promotes the exact reviewed revisions after conflict checks.
    Content preview is separate from TEST/LIVE transaction credentials and
-   remains planned until its authorization and delivery operations ship.
+   requires verified authorization and delivery operations for the destination.
 5. Only invoke operations actually exposed and authorized for the destination.
    `plan_integration` and `validate_integration` are not evidence of an
    executable import when this recipe is planned. Do not invent CMS methods
