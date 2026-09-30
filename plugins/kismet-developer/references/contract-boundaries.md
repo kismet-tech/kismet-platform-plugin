@@ -10,5 +10,5 @@
 - Credential issuance is privileged. Establish an authorized server secret destination before issuing a once-only server credential. Never put that result into chat, source, logs, browser storage or plugin configuration.
 - Kismet Checkout is the product, Agent Checkout the channel, and Agent Pay the rail. The TEST booking-request operation is not a production checkout adapter. Obtain the supported checkout contract; do not generate a replacement payment or reservation engine.
 - Stripe onboarding exit or return is not evidence that payments are ready. Read authoritative account and checkout readiness separately. An existing Stripe login can be reused where onboarding supports it; do not promise that an arbitrary existing account can become the Agent Pay account.
-- For a Starter request, follow [the launch workflow](starter-launch.md). The 1.0 release proposal is a target, not an available recipe or permission to use planned operations.
+- For a Starter Account request, follow [the launch workflow](starter-launch.md). The 1.0 release proposal is a target, not an available recipe or permission to use planned operations.
 - Custom data objects are pending the #77 reference implementation and #46 contract review. Do not invent generic object CRUD.

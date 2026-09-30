@@ -7,7 +7,7 @@ what remains before live bookings are enabled. Any assisted live review has a
 visible status and resume path. This is a separate delivery workstream consumed
 by the Developer 1.0 release.
 
-## Starter pricing and dashboard
+## Starter Account pricing and dashboard
 
 No upfront charge and no monthly SaaS subscription in this version. Proposed
 Kismet fees: 0.9% for normal checkout and 2.9% for Agent Checkout, with
@@ -16,7 +16,7 @@ to separate channels; do not add the normal rate to the agent rate.
 Normal-checkout fees are proposed to be billed monthly. Define the precise fee
 base, refund treatment and agent billing cadence before implementing billing.
 
-| Surface | Starter treatment |
+| Surface | Starter Account treatment |
 | --- | --- |
 | Direct storefront | Enabled |
 | Telemetry, Guestbook and checkout | Included |
@@ -27,7 +27,7 @@ base, refund treatment and agent billing cadence before implementing billing.
 | Website module | Omitted from the sidebar |
 
 Gray styling must remain readable and have a text explanation such as "Not
-included in Starter". Avoid upgrade buttons that imply a monthly subscription
+included in Starter Account". Avoid upgrade buttons that imply a monthly subscription
 for this version. Apply plan access consistently to direct routes and APIs;
 sidebar appearance alone is not entitlement enforcement. Preserve other
 plans' existing access. Website creation and deployment stay in the plugin
@@ -77,11 +77,11 @@ readiness separately from payment and booking readiness.
 
 ## Delivery slices
 
-1. **Starter cleanup and Integrations:** scoped navigation, feature access,
+1. **Starter Account cleanup and Integrations:** scoped navigation, feature access,
    pricing disclosure, provider catalog, Guesty connect/resume, support actions
    and collection permissions.
 2. **Payment setup dependency:** consume the existing onboarding release and
-   verify authorized access and its readiness states within Starter.
+   verify authorized access and its readiness states within Starter Account.
 3. **Activation:** a persistent inventory, payment and checkout checklist.
    Returning later resumes the same setup.
 4. **External acceptance:** a fresh non-staff account deploys a preview,
@@ -90,7 +90,7 @@ readiness separately from payment and booking readiness.
 
 ## Acceptance cases
 
-- Starter has no upfront or monthly SaaS charge; checkout rates and passed-through
+- A Starter Account has no upfront or monthly SaaS charge; checkout rates and passed-through
   card fees are disclosed consistently. Billing terms are resolved before activation.
 - Direct remains enabled; Funnels, Email and other storefronts are grayed out
   with readable explanations. Website is absent from the sidebar. Required

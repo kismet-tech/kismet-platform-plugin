@@ -13,7 +13,7 @@ The Developer plugin helps builders create, configure and maintain their site.
 Kismet Checkout is the transaction product, Agent Checkout the channel, and
 Agent Pay the payment rail.
 
-Starter includes telemetry, Guestbook and checkout access with no upfront
+A Starter Account includes telemetry, Guestbook and checkout access with no upfront
 charge and no monthly SaaS subscription in this version. The proposed Kismet
 fees are 0.9% for normal checkout and 2.9% for Agent Checkout, with credit-card
 processing fees passed through separately. Present these as the respective
@@ -23,7 +23,7 @@ Normal-checkout fees are proposed to be billed monthly; the precise fee base,
 refund treatment and Agent Checkout billing cadence must be specified before
 billing implementation. This proposal does not change live prices or billing.
 
-Keep the Starter dashboard focused on the Direct storefront, telemetry,
+Keep the Starter Account dashboard focused on the Direct storefront, telemetry,
 Guestbook, checkout and setup. Gray out Funnels, Email and every storefront
 other than Direct, with a readable explanation that they are not included in
 this version. Omit the Website module from the sidebar. Building and deploying
@@ -91,7 +91,7 @@ your AI coding assistant. Start with a preview, connect Guesty, add guest login
 and telemetry, and set up Kismet Checkout. Kismet guides deployment and payment
 setup and shows what remains before your site can accept bookings.
 
-**Starter prompts:**
+**Example prompts:**
 
 - Build my vacation rental website with agent checkout.
 - Connect Guesty and prepare my website to accept bookings.
@@ -156,7 +156,7 @@ permissions, resumption, state handling and checkout evidence.
 - [ ] An approved LIVE pilot verifies the actual activation and booking path.
 - [ ] Fresh-host installation, provider authorization, deployment and rollback pass.
 - [ ] Public docs, recipes and plugin claims agree with shipped capabilities.
-- [ ] Starter navigation enables Direct, grays out Funnels, Email and other
+- [ ] Starter Account navigation enables Direct, grays out Funnels, Email and other
   storefronts, and omits the Website module without breaking setup access.
 - [ ] Pricing disclosure and billing agree on channel rate, fee base, cadence,
   refund treatment and passed-through card fees; no monthly SaaS subscription.

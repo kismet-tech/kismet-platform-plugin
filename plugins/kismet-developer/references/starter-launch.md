@@ -1,4 +1,4 @@
-# Build a Starter site
+# Build a site with a Starter Account
 
 This workflow guides use of shipped contracts. It does not add API capabilities
 or certify the proposed 1.0 release.
