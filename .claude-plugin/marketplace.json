@@ -22,7 +22,7 @@
     {
       "name": "kismet-developer",
       "source": "./plugins/kismet-developer",
-      "description": "Kismet for Developers: build and validate branded sites with the Developer API, SDK, Fixtures, and agent-readable contracts.",
+      "description": "Kismet for Developers: build a branded vacation rental website preview, validate integrations, and prepare guest accounts, telemetry and checkout setup.",
       "version": "0.1.3",
       "author": {
         "name": "Kismet",

@@ -7,6 +7,10 @@ description: Build or extend a branded site using the Kismet Developer API and S
 
 Read [../../references/contract-boundaries.md](../../references/contract-boundaries.md).
 
+For a request such as "build my vacation rental website with agent checkout",
+also read [../../references/starter-launch.md](../../references/starter-launch.md).
+Deliver a truthful preview while identifying the separate live-activation steps.
+
 1. Call `describe_capabilities` to establish the shipped surface and, when a credential is presented, its environment and positive grants.
 2. Call `list_recipes` and choose the smallest available recipe that covers the requested page or behavior.
 3. Call `plan_integration` with the framework and explicit `fixtures` or `live` mode.
