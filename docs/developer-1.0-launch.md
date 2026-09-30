@@ -13,9 +13,21 @@ The Developer plugin helps builders create, configure and maintain their site.
 Kismet Checkout is the transaction product, Agent Checkout the channel, and
 Agent Pay the payment rail.
 
-The proposed free Starter includes telemetry, Guestbook and checkout access.
-Processing and applicable channel fees must be disclosed separately. Final
-commercial terms require confirmation; this proposal sets no fee rates.
+Starter includes telemetry, Guestbook and checkout access with no upfront
+charge and no monthly SaaS subscription in this version. The proposed Kismet
+fees are 0.9% for normal checkout and 2.9% for Agent Checkout, with credit-card
+processing fees passed through separately. Present these as the respective
+channel rates, not additive platform fees.
+
+Normal-checkout fees are proposed to be billed monthly; the precise fee base,
+refund treatment and Agent Checkout billing cadence must be specified before
+billing implementation. This proposal does not change live prices or billing.
+
+Keep the Starter dashboard focused on the Direct storefront, telemetry,
+Guestbook, checkout and setup. Gray out Funnels, Email and every storefront
+other than Direct, with a readable explanation that they are not included in
+this version. Omit the Website module from the sidebar. Building and deploying
+a website remains part of the plugin journey.
 
 Start with one supported starter, one hosting path, Guesty and one supported
 checkout implementation. Vercel is the proposed first new-site deployment path.
@@ -88,9 +100,12 @@ setup and shows what remains before your site can accept bookings.
 **Activation qualification, if needed:** Build your preview yourself. We review
 your inventory and checkout setup before activating live bookings.
 
-**Free Starter qualification, subject to commercial confirmation:** Starter has
-no subscription fee. Payment processing and applicable booking-channel fees
-are shown before activation.
+**Proposed pricing copy:** No upfront cost. No monthly subscription. 0.9% on
+normal checkout. 2.9% on Agent Checkout. Credit-card processing fees are passed
+through separately.
+
+Show the agreed fee basis and billing cadence before activation. Prefer
+"Start with no upfront cost" over an unqualified "free checkout" claim.
 
 ## Connect your Stripe
 
@@ -141,6 +156,10 @@ permissions, resumption, state handling and checkout evidence.
 - [ ] An approved LIVE pilot verifies the actual activation and booking path.
 - [ ] Fresh-host installation, provider authorization, deployment and rollback pass.
 - [ ] Public docs, recipes and plugin claims agree with shipped capabilities.
+- [ ] Starter navigation enables Direct, grays out Funnels, Email and other
+  storefronts, and omits the Website module without breaking setup access.
+- [ ] Pricing disclosure and billing agree on channel rate, fee base, cadence,
+  refund treatment and passed-through card fees; no monthly SaaS subscription.
 - [ ] Both plugin manifests and the Claude marketplace developer entry move to
   1.0.0 together; validate, publish and verify a fresh installation.
 
