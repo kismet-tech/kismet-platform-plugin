@@ -1,22 +1,22 @@
 {
   "name": "kismet-developer",
   "version": "0.1.3",
-  "description": "Build, validate, and ship branded Kismet sites with the Developer API, TypeScript SDK, Fixtures, and agent-readable contracts.",
+  "description": "Build branded vacation rental websites, validate Kismet integrations, and prepare guest accounts, telemetry and checkout setup.",
   "author": {
     "name": "Kismet"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Kismet Developer",
-    "shortDescription": "Build branded sites on Kismet APIs and Fixtures.",
-    "longDescription": "Kismet Developer gives coding agents canonical API references, integration recipes, fixture plans, semantic-search and guest-account workflows, and deterministic pre-promotion checks.",
+    "shortDescription": "Build your vacation rental website with Kismet.",
+    "longDescription": "Build a branded website preview with your coding agent. Use Kismet contracts, search and guest-account workflows, inspect live-activation requirements, and manage authorized setup. Available capabilities depend on your access and the current recipes.",
     "developerName": "Kismet",
     "category": "Developer Tools",
-    "capabilities": ["Interactive", "Read"],
+    "capabilities": ["Interactive", "Read", "Write"],
     "websiteURL": "https://developers.kismet.travel/",
     "defaultPrompt": [
-      "Build a Kismet-powered site from fixtures, then prepare it for live data.",
-      "Add natural-language search with the Kismet SDK.",
+      "Build my vacation rental website preview and show what is needed for agent checkout.",
+      "Check what I need to connect Guesty and set up Stripe for Kismet Checkout.",
       "Validate this Kismet integration before deployment."
     ],
     "brandColor": "#111827",

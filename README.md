@@ -5,8 +5,9 @@ The official plugin marketplace for building on and operating
 plugins:
 
 - `kismet-operators` connects authenticated collection operators to Kismet.
-- `kismet-developer` gives coding agents public, build-time guidance for the
-  Developer API, SDK, Fixtures, and integration validation.
+- `kismet-developer` helps coding agents build branded booking websites with
+  the Developer API, SDK, Fixtures, and integration validation. Public discovery
+  is complemented by authorized setup tools for Kismet managers.
 
 Both plugins work in Claude and Codex. Lovable connects directly to the same
 Developer MCP because it does not install repository-backed plugin bundles.
@@ -64,13 +65,19 @@ source repository; versions here always match what the Kismet platform serves.
 
 ## Kismet for Developers
 
-The same marketplace also contains `kismet-developer`, a public build-time
+The same marketplace also contains `kismet-developer`, a build-time
 plugin for coding agents. It connects to the Developer MCP, reads the canonical
 Developer API and Fixture contracts, and supplies workflows for SDK sites,
 semantic search, branded guest accounts, TEST booking, fixture-backed builds,
 partner-page fixture installs through the staging proxy, and pre-deployment
-validation. It contains no developer credential and does not
-expose runtime guest data.
+validation. Its checked-in configuration contains no developer credential.
+With manager authorization, the MCP also supports scoped setup and management;
+the deployed site's guest experience uses the Developer API and trusted Fixtures.
+
+The proposed 1.0 experience starts with: **"Build my vacation rental website
+with agent checkout."** See the [release proposal](docs/developer-1.0-launch.md)
+for current evidence, missing capabilities, suggested launch language, and the
+separate self-serve activation workstream. The proposal is not a release notice.
 
 ### Codex
 
@@ -108,9 +115,12 @@ resources exposed by the MCP. The ten local workflow skills bundled with the
 Codex and Claude plugin are not installed in Lovable, so begin by asking the
 agent to call `list_recipes` or `plan_integration`.
 
-The Developer MCP is public and read-only. Installing this plugin does not
-require a Kismet account or a Developer API credential. Credentials belong in
-the application being built, never in the plugin configuration.
+Public discovery and authenticated management are different access levels.
+Read the tools and capabilities actually offered by the connection. Manager
+setup requires the appropriate Kismet role, authorization and confirmation;
+installing the plugin alone does not grant access to a collection. Issue runtime
+credentials only into an authorized server secret store, never into chat,
+source code, a browser bundle or the plugin configuration.
 
 ---
 
