@@ -33,11 +33,18 @@ Every address below is decided by Kismet, never by the site. Which brief a host 
    Without the adapter: `llmsTxt({ ..., agentEntry: entry })`, `aiRobots({ ..., connectorBriefUrl: entry.marks.find((m) => m.agent === 'muse')?.briefUrl ?? null })`, `mcpServerCardResponse(entry.slug)`.
 5. **The card's pointer on every page**: `<link rel="mcp-server" href="/.well-known/mcp.json">` (`MCP_SERVER_LINK_TAG` from `/server`) in the document head, or the `Link` header `MCP_SERVER_LINK_HEADER`.
 6. **The Organization node** needs nothing more: with `collectionSlug` on `defineSite` and the site passed to `<Kismet.Page site>` or `jsonLdForPage(page, site)`, every page's Organization carries the For AI agents page as `subjectOf`.
-7. **Check it.** `npx kismet check <url> --env production` must report no `site/agent-entry` and no `site/agent-connector` finding, and a plain fetch of a property page must show the marks with brief hrefs in the server HTML.
+7. **Your own domain as the door.** Which host a door is on is Kismet's decision: the authority names the brand host for the guest MCP endpoint only after its stored check saw that host answer an MCP initialize and serve the brief; until then every door is on kismet.travel, and the entry carries the answer (`mcpUrl`, `mcpHost`, `federatedMcpUrl`, `forAgentsUrl`). To pass the check, run the two relays on the site's domain and spell no host yourself:
+   ```ts
+   // app/c/[slug]/mcp/route.ts:        export const POST = (request: Request) => adapter.mcp(request);
+   // app/connectors/[brief]/route.ts:  export const GET = (request: Request) => adapter.connectorBrief(request);
+   ```
+   (`relayMcp` and `relayConnectorBrief` from `/server` for a site not on the adapter.) Then register and verify the site's domain on the collection and set the site origin to the canonical host its routes are stored on; the next domain sync runs the check and the doors move to the domain with no code change.
+8. **Check it.** `npx kismet check <url> --env production` must report no `site/agent-entry` and no `site/agent-connector` finding, and a plain fetch of a property page must show the marks with brief hrefs in the server HTML.
 
 Never:
 - a block of text inside the page's main content telling a guest how to connect an assistant (it was tried on partner sites and removed);
 - a link to the guest MCP endpoint (it answers POST only; print it as text in llms.txt and the card, never as an anchor);
+- a host spelled by the site for any door: the authority decides brand host versus kismet.travel, and a relay that forwards Authorization (sign-in through a brand host is a separate decision);
 - a brief address written by hand, or a marked endpoint (`?src=`) anywhere a page prints;
 - an infra call on a component's render path;
 - hidden text or an sr-only link that carries an address a person cannot see.
