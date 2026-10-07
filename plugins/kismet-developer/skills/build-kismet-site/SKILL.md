@@ -13,7 +13,8 @@ Read [../../references/contract-boundaries.md](../../references/contract-boundar
 4. Call `get_operation` for every operation in the plan before writing the adapter.
 5. Keep product primitives generic. Vertical names may be aliases, but do not leak a customer's branding into SDK or Fixture contracts.
 6. Implement through one server-safe adapter boundary. Keep server credentials out of client bundles.
-7. Call `validate_integration` with the relevant source and configuration text.
-8. Run typecheck, tests, and `npx kismet check <url>` locally.
+7. Put the collection's agent doors in with `add-kismet-agent-discoverability` (the marks, the footer row, llms.txt, robots.txt, the MCP server card, the Organization node), so an AI agent that reaches the site finds the way to book with this collection.
+8. Call `validate_integration` with the relevant source and configuration text.
+9. Run typecheck, tests, and `npx kismet check <url>` locally.
 
 Where the contract is silent, stop and flag the missing contract.

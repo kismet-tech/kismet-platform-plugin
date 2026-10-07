@@ -1,6 +1,6 @@
 {
   "name": "kismet-developer",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Build, validate, and ship branded Kismet sites with the Developer API, TypeScript SDK, Fixtures, and agent-readable contracts.",
   "author": {
     "name": "Kismet"
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "Kismet Developer",
     "shortDescription": "Build branded sites on Kismet APIs and Fixtures.",
-    "longDescription": "Kismet Developer gives coding agents canonical API references, integration recipes, fixture plans, semantic-search and guest-account workflows, and deterministic pre-promotion checks.",
+    "longDescription": "Kismet Developer gives coding agents canonical API references, integration recipes, fixture plans, semantic-search, guest-account and agent-discoverability workflows, and deterministic pre-promotion checks.",
     "developerName": "Kismet",
     "category": "Developer Tools",
     "capabilities": ["Interactive", "Read"],
