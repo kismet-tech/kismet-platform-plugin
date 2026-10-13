@@ -5,7 +5,7 @@ description: Put the doors to a Kismet collection where an AI agent finds them o
 
 # Add Kismet agent discoverability
 
-Read the guide first: https://developers.kismet.travel/sdk/agent-discoverability/ (its Markdown twin is at the same address with `.md`). The SDK is `@kismet-tech/sdk` at the version that carries `resolveAgentEntry` (the `beta` tag from 2026-10 onward); the Kismet Next.js starter is the worked example (`src/lib/kismet/agent-entry.ts` and the files it feeds).
+The canonical recipe is `agent-discoverability` on the Kismet Developer MCP: call `get_recipe` with it first, and `plan_integration` with it before editing the site; this skill follows the same eight steps. Read the guide next: https://developers.kismet.travel/sdk/agent-discoverability/ (its Markdown twin is https://developers.kismet.travel/sdk/agent-discoverability.md). The SDK is `@kismet-tech/sdk` at the version that carries `resolveAgentEntry` (the `beta` tag from 2026-10 onward, `0.2.0-beta.1-agents.20261007.1` or later); the Kismet Next.js starter is the worked example (`src/lib/kismet/agent-entry.ts` and the files it feeds).
 
 Every address below is decided by Kismet, never by the site. Which brief a host names for each agent, whether it is the collection's own brand brief or the shared Kismet one, comes from the connector authority. The SDK asks it once and caches the answer for the five minutes Kismet advertises.
 
@@ -39,7 +39,7 @@ Every address below is decided by Kismet, never by the site. Which brief a host 
    // app/connectors/[brief]/route.ts:  export const GET = (request: Request) => adapter.connectorBrief(request);
    ```
    (`relayMcp` and `relayConnectorBrief` from `/server` for a site not on the adapter.) Then register and verify the site's domain on the collection and set the site origin to the canonical host its routes are stored on; the next domain sync runs the check and the doors move to the domain with no code change.
-8. **Check it.** `npx kismet check <url> --env production` must report no `site/agent-entry` and no `site/agent-connector` finding, and a plain fetch of a property page must show the marks with brief hrefs in the server HTML.
+8. **Check it.** Call `validate_integration` with the `agent-discoverability` recipe and the site's source: its errors are a door address the site spelled itself or a marked endpoint, its warnings are surfaces the source never wires. Then `npx kismet check <url> --env production` must report no `site/agent-entry` and no `site/agent-connector` finding, and a plain fetch of a property page must show the marks with brief hrefs in the server HTML.
 
 Never:
 - a block of text inside the page's main content telling a guest how to connect an assistant (it was tried on partner sites and removed);
