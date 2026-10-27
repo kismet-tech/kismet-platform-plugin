@@ -38,7 +38,9 @@ before interpreting results.
    funnel this week?") with `list_shoppers` — it is the same pipeline the
    Guests page stage cards read, so its counts match the screen too.
 3. Drill into one person with `get_guest` before drafting anything addressed
-   to them. Check `audiences[]` on the result: `member: true, mailable: false`
+   to them. Pass the `guestId` returned by `search_guests` as `guest_id`, along
+   with `collection_slug` (`guestId` is also accepted as a compatibility alias).
+   Check `audiences[]` on the result: `member: true, mailable: false`
    means a campaign would skip them — surface that, never work around it.
 4. To act on a search repeatedly, save it: `save_audience` with the same
    filters (rolling windows keep it evergreen). Preview → confirm, per the

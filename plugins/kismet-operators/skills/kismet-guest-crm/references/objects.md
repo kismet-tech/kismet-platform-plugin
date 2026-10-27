@@ -72,7 +72,10 @@ like this one, in three parts:
 reads as an insult next to their history. Do not compute one. The set-level
 expectation exists only on an **audience** (`clv.expectedNextYearCents` and the
 `ifTwentyPctReturnCents` scenario) where it is honest and large — say "expected"
-and "if 20% return", never "will earn".
+and "if 20% return", never "will earn". The audience object also carries
+`basis` (`collection` / `portfolio` / `mixed`), `portfolioScored` (members
+scored on the portfolio cell because the collection's own cell was too thin)
+and `basisNote` (one printable line). Print the note beside the figure.
 
 ## Audience membership — member vs mailable
 

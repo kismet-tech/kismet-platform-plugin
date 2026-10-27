@@ -172,7 +172,14 @@ $34k–$66k."_ Nobody is re-marketing to this person today; that is the finding.
 `stats.clv`: `expectedNextYearCents` (Σ over members) and
 `ifTwentyPctReturnCents`. Present both, labeled: _"expected next-year value
 $X · if 20% return, $Y"_ — beside the observed revenue, never blended with it.
-This is how a campaign gets sized before it is sent.
+This is how a campaign gets sized before it is sent. Always print the basis
+beside the figure: `stats.clv.basisNote` says whether it came from this
+collection's own history, from portfolio history, or a mix
+(`stats.clv.basis` is `collection` / `portfolio` / `mixed`, and
+`portfolioScored` is how many of the `scored` members fell back to the
+portfolio because the collection has too few guests like them). A
+portfolio-scored figure is an estimate borrowed from other operators and must
+be labeled as such.
 
 **Do not** rank individual guests by a computed expected value (there isn't
 one), and do not describe `ifReturnUsd` as what they will spend.
@@ -390,9 +397,9 @@ party":
 
 ## From search to action
 
-| Goal                | Move                                                    |
-| ------------------- | ------------------------------------------------------- |
-| Look at one person  | `get_guest` with their `guestId`                        |
-| Email the whole set | `save_audience` (same filters) → campaign tooling       |
-| Keep the set fresh  | rolling windows in the saved rule; never absolute dates |
-| Remember something  | `add_guest_note` on the person                          |
+| Goal                | Move                                                                                   |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| Look at one person  | `get_guest` with `collection_slug` and `guest_id` set to the search result's `guestId` |
+| Email the whole set | `save_audience` (same filters) → campaign tooling                                      |
+| Keep the set fresh  | rolling windows in the saved rule; never absolute dates                                |
+| Remember something  | `add_guest_note` on the person                                                         |
