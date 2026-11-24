@@ -4,6 +4,7 @@ import datetime
 import hashlib
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.parse
@@ -13,6 +14,7 @@ from pathlib import Path
 
 from candidate import CANDIDATE, CandidateSandbox, candidate_functions, grade_candidate
 from grade import grade
+from revised import REVISED, RevisedSandbox, revised_functions, grade_revised
 from sandbox import CATALOG, DOCUMENTS, HERE, SKILLS, Sandbox, functions
 
 CASES = json.loads((HERE / "cases.json").read_text())
@@ -27,7 +29,7 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
-def model_client(base_url, model):
+def model_client(base_url, model, max_tokens=1400):
     url = urllib.parse.urlsplit(base_url)
     if url.username or url.password or url.query or url.fragment:
         raise ValueError("Use a model base URL without credentials, query or fragment")
@@ -41,7 +43,7 @@ def model_client(base_url, model):
 
     def complete(messages, tools):
         body = json.dumps({"model": model, "messages": messages, "tools": tools,
-                           "max_tokens": 1400, "temperature": 0.2}).encode()
+                           "max_tokens": max_tokens, "temperature": 0.2}).encode()
         req = urllib.request.Request(base_url.rstrip("/") + "/chat/completions", body, headers)
         with opener.open(req, timeout=180) as response:
             result = json.load(response)
@@ -53,6 +55,8 @@ def model_client(base_url, model):
 
 
 def sandbox_for(world, surface):
+    if surface == "revised":
+        return RevisedSandbox(world)
     return CandidateSandbox(world) if surface == "candidate" else Sandbox(world, surface)
 
 
@@ -60,7 +64,9 @@ def run_case(case, surface, complete, env=None):
     # No session ID, conversation history, assistant runtime or file tools are sent.
     messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": case["prompt"]}]
     env = env or sandbox_for(case["world"], surface)
-    available = candidate_functions() if surface == "candidate" else functions(surface)
+    available = candidate_functions() if surface in {"candidate", "revised"} else functions(surface)
+    if surface == "revised":
+        available = revised_functions()
     resolved = None
     for _ in range(12):
         raw, resolved = complete(messages, available)
@@ -69,7 +75,7 @@ def run_case(case, surface, complete, env=None):
         if not calls:
             if not answer.strip():
                 raise ValueError("empty final answer")
-            score = grade_candidate(case, answer, env) if surface == "candidate" else grade(case, answer, env.trace)
+            score = score_answer(case, answer, env)
             return {"answer": answer, "model_returned": resolved, "trace": env.trace,
                     **score}
         if len(calls) + len(env.trace) > 24:
@@ -88,6 +94,22 @@ def run_case(case, surface, complete, env=None):
     raise ValueError("turn budget reached")
 
 
+def score_answer(case, answer, env):
+    if env.surface not in {"revised", "candidate"}:
+        return grade(case, answer, env.trace)
+    scorer = grade_revised if env.surface == "revised" else grade_candidate
+    result = scorer(case, answer, env)
+    if case["id"] == "draft-holdout":
+        for draft in env.drafts.values():
+            if not re.search(r"(?<![\w-])" + re.escape(draft["id"]) + r"(?![\w-])", answer):
+                result["failures"].append("missing review receipt: " + draft["id"])
+    elif env.drafts and not result["failures"]:
+        result["failures"].append("unexpected persisted draft")
+    if result["failures"]:
+        result.update(behavior_pass=False, task_completed=False)
+    return result
+
+
 def digest(data):
     return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
 
@@ -96,22 +118,23 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True)
     parser.add_argument("--base-url", default="http://127.0.0.1:1234/v1")
-    parser.add_argument("--surface", choices=("compact", "operations", "candidate"), default="compact")
+    parser.add_argument("--surface", choices=("compact", "operations", "candidate", "revised"), default="compact")
     parser.add_argument("--split", choices=("all", "development", "holdout"), default="all")
     parser.add_argument("--case", choices=[c["id"] for c in CASES], action="append")
+    parser.add_argument("--max-tokens", type=int, default=1400)
     parser.add_argument("--repeat", type=int, default=1)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     selected = [c for c in CASES if args.split in ("all", c["split"]) and
                 (not args.case or c["id"] in args.case)]
-    if not selected or args.repeat < 1:
-        parser.error("Select at least one case and a positive repeat count")
-    complete = model_client(args.base_url, args.model)
-    metadata = {"model": args.model, "surface": args.surface, "temperature": 0.2,
+    if not selected or args.repeat < 1 or args.max_tokens < 1:
+        parser.error("Select at least one case and positive repeat and token budgets")
+    complete = model_client(args.base_url, args.model, args.max_tokens)
+    metadata = {"model": args.model, "surface": args.surface, "temperature": 0.2, "max_tokens": args.max_tokens,
                 "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-                "skills_sha256": digest(DOCUMENTS), "catalog_sha256": digest({"current": CATALOG, "proposed": CANDIDATE}),
+                "skills_sha256": digest(DOCUMENTS), "catalog_sha256": digest({"current": CATALOG, "proposed": CANDIDATE, "revised": REVISED}),
                 "cases_sha256": digest(CASES), "system_sha256": digest(SYSTEM),
-                "runner_sha256": digest({n: (HERE / n).read_text() for n in ("run.py", "sandbox.py", "grade.py", "candidate.py")})}
+                "runner_sha256": digest({n: (HERE / n).read_text() for n in ("run.py", "sandbox.py", "grade.py", "candidate.py", "revised.py")})}
     counts = Counter()
     # Exclusive creation keeps historical runs immutable. Persist each completed case.
     with args.output.open("x") as stream:

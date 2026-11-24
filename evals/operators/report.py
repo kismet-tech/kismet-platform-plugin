@@ -44,7 +44,7 @@ def main():
         meta, runs = read_run(path)
         configurations.add(tuple(meta.get(k) for k in ("catalog_sha256", "cases_sha256", "skills_sha256",
                                                        "system_sha256", "runner_sha256", "grader_sha256")) +
-                           (tuple(sorted({r["case"] for r in runs})), meta["temperature"]))
+                           (tuple(sorted({r["case"] for r in runs})), meta["temperature"], meta.get("max_tokens", 1400)))
         rows.append({"file": path.name, "model": meta["model"], "surface": meta["surface"], **summarize(runs)})
     if len(configurations) != 1:
         parser.error("Catalog, cases, skills, runner, instructions, sampling temperature or selected cases differ")

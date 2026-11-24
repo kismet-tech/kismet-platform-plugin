@@ -4,10 +4,8 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from candidate import grade_candidate
-from grade import grade
 from report import read_run
-from run import CASES, digest, sandbox_for
+from run import CASES, digest, sandbox_for, score_answer
 
 BY_ID = {case["id"]: case for case in CASES}
 
@@ -24,7 +22,7 @@ def rescore(row, surface):
         env.call(event["tool"], event["arguments"])
         if env.trace[-1] != event:
             raise ValueError(f"Fixture response changed in {row['case']} at {event['tool']}")
-    score = grade_candidate(case, row["answer"], env) if surface == "candidate" else grade(case, row["answer"], env.trace)
+    score = score_answer(case, row["answer"], env)
     return {**row, **score}
 
 
@@ -37,7 +35,7 @@ def main():
     if meta["cases_sha256"] != digest(CASES):
         parser.error("The frozen cases differ from this checkout")
     base = Path(__file__).resolve().parent
-    rubric = digest({n: (base / n).read_text() for n in ("grade.py", "candidate.py")})
+    rubric = digest({n: (base / n).read_text() for n in ("grade.py", "candidate.py", "revised.py")})
     metadata = {**meta, "regraded_from": args.source.name, "grader_sha256": rubric}
     results = [rescore(r, meta["surface"]) for r in rows]
     counts = Counter(total=len(results), behavior_pass=sum(r["behavior_pass"] for r in results),

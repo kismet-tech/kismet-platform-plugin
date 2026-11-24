@@ -10,6 +10,12 @@ Follow the shared precedence, handoff, and approval rules in [../../references/r
 
 Own only paid Google, paid ChatGPT/OpenAI, and paid Meta/audience actions. Route Google organic, ChatGPT organic, Meta organic, and Direct/unattributed diagnosis to traffic/performance or Generate Demand.
 
+## Read campaign evidence
+
+For a campaign status question, read that campaign on the requested platform. Use the campaigns section when the connection offers a combined ads report. Report the live provider status and its observation time when available. If the lookup fell back to Kismet's record, give the saved value and say that the current provider status is unknown. Traffic or account health alone cannot settle whether a particular campaign is running.
+
+For Meta attribution, give provider-reported purchases and matched Kismet bookings separately, with the period and attribution basis. A match does not establish that the ad caused a booking. For a Google conversion-upload question, look in account health for accepted and rejected counts, the last attempt time and its error.
+
 ## Required setup: Google bids on Kismet's bookings
 
 Before a Google campaign is enabled on an account, and before any budget, bidding or goal advice, read `get_ads_account_health`. If `conversionAction.health` is `block`, or `conversionAction.kismetOwned` is `false`, the account is learning from someone else's conversions and nothing downstream can be trusted: stop and get the setup done first.
