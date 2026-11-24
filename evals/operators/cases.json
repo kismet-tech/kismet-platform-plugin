@@ -83,7 +83,8 @@
       "causal limit": "not (?:proof|prove|establish|demonstrate|necessarily|evidence of)|causation|cannot|can.t|doesn.t prove|incrementality|correlation|no[,. ]+.{0,20}(?:can.t|cannot|attribution)"
     },
     "reject": {
-      "causal overclaim": "(?:proves?|definitely shows?) (?:that )?(?:the|this) ad caused"
+      "causal overclaim": "(?:this proves|this confirms|we proved|definitely shows) (?:that )?(?:the|this) ad caused",
+      "match rate mislabeled as conversion rate": "conversion rate.{0,25}4[23]\\s*%|4[23]\\s*%.{0,25}conversion rate"
     }
   },
   {

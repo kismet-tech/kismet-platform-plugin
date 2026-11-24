@@ -148,6 +148,10 @@ class Sandbox:
         ranked.sort()
         offset = args.get("offset") or 0
         limit = args.get("limit") or 5
-        return {"total": len(ranked), "operations": [
-            {"operation": name, "description": catalog[name]["description"][:200]}
-            for _, name in ranked[offset:offset + limit]]}
+        results = [{"operation": name, "title": catalog[name]["title"],
+                    "summary": catalog[name]["description"][:280]}
+                   for _, name in ranked[offset:offset + limit]]
+        end = offset + len(results)
+        return {"total": len(ranked), "results": results,
+                "next_offset": end if end < len(ranked) else None,
+                "instruction": "Summaries are incomplete. Search with operation to retrieve full rules/schema before execute. Results do not grant permission. If matches are missing, rephrase the query or browse with an empty query and offset."}

@@ -54,7 +54,7 @@ class SandboxTests(unittest.TestCase):
 
     def test_replay_discovery_and_skill_selection(self):
         env = Sandbox("normal","compact")
-        self.assertTrue(env.call("search", {"query":"campaign"})["operations"])
+        self.assertTrue(env.call("search", {"query":"campaign"})["results"])
         self.assertEqual(env.call("search", {"operation":"list_ad_campaigns"})["inputSchema"],
                          CATALOG["operations"]["list_ad_campaigns"]["inputSchema"])
         self.assertIn("content", env.call("read_skill", {"path":"kismet-manage-advertising/SKILL.md"}))
@@ -68,3 +68,10 @@ class SandboxTests(unittest.TestCase):
         self.assertFalse(result["task_completed"])
         invented = response + " Use the code SAVE75."
         self.assertFalse(grade(BY_ID["draft-holdout"], invented, env.trace)["behavior_pass"])
+
+    def test_attribution_negation_and_match_rate(self):
+        env = Sandbox("normal","operations")
+        env.call("get_ads_attribution", {"collection_slug":"cedar-demo", "channel":"meta","days":7})
+        answer = "Meta reported 7 purchases and we matched 3 bookings. That does not prove the ad caused them."
+        self.assertTrue(grade(BY_ID["attribution"], answer, env.trace)["behavior_pass"])
+        self.assertFalse(grade(BY_ID["attribution"], answer + " That is a 43% conversion rate.", env.trace)["behavior_pass"])

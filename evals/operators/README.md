@@ -41,3 +41,5 @@ Review the actual answers alongside the machine checks. In particular, verify so
 5. Verify promising fixes in the target host with an ordinary OAuth account and an assigned test collection. Repeat with an unassigned collection and a disabled module. For authorized action tests, require read-back of the draft, test delivery, or provider state as appropriate. Record only redacted evidence in review.
 
 The evaluation design follows the [OpenAI evaluation guide](https://developers.openai.com/api/docs/guides/evaluation-best-practices).
+
+To compare complete runs, use `python evals/operators/report.py /tmp/operators-compact.jsonl /tmp/operators-named.jsonl`. It checks the skills, catalog, case and runner fingerprints, selected cases and temperature before showing totals, per-case passes, repeated-trial consistency and runtime failures. Model output is stochastic even with fixed temperature. Rerun after changes and retain the earlier file for a dated baseline. Use separate reports when one of the fingerprints changes.
