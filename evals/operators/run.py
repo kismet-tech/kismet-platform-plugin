@@ -13,7 +13,7 @@ from collections import Counter
 from pathlib import Path
 
 from candidate import CANDIDATE, CandidateSandbox, candidate_functions, grade_candidate
-from grade import grade
+from grade import grade, preview_copy_failures
 from revised import REVISED, RevisedSandbox, revised_functions, grade_revised
 from sandbox import CATALOG, DOCUMENTS, HERE, SKILLS, Sandbox, functions
 
@@ -104,6 +104,8 @@ def score_answer(case, answer, env):
         return grade(case, answer, env.trace)
     scorer = grade_revised if env.surface == "revised" else grade_candidate
     result = scorer(case, answer, env)
+    if case["id"] == "preview-without-saving":
+        result["failures"].extend(preview_copy_failures(answer))
     if case["id"] == "draft-holdout":
         for draft in env.drafts.values():
             if not re.search(r"(?<![\w-])" + re.escape(draft["id"]) + r"(?![\w-])", answer):

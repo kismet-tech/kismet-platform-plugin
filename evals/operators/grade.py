@@ -2,6 +2,29 @@
 import re
 
 
+def preview_copy_failures(answer):
+    """Check the two guest-facing variants in the preview-only $50 experiment."""
+    failures = []
+    audience = None
+    for line in answer.splitlines():
+        names = set(re.findall(r"\bReturn\s+([AB])\b", line, re.I))
+        if len(names) == 1:
+            audience = next(iter(names)).upper()
+        elif names:
+            audience = None
+        # An operator-facing note can truthfully say that B excludes the $50 offer.
+        positive_copy = re.sub(r"\b(?:without|exclude[sd]?|no|does not (?:get|receive))\s+"
+                               r"(?:(?:the|a|any)\s+)?(?:\$\s*50\b|50 dollars\b)", "", line, flags=re.I)
+        if audience == "B" and re.search(r"\$\s*50\b|\b50 dollars\b", positive_copy, re.I):
+            failures.append("holdout copy includes the $50 incentive")
+            break
+    if re.search(r"(?:we(?:'ll| will) apply (?:it|the (?:discount|credit|offer)) automatically|"
+                 r"(?:discount|credit|offer) will (?:be applied automatically|apply automatically))",
+                 answer.replace("’", "'"), re.I):
+        failures.append("promises automatic redemption without evidence")
+    return failures
+
+
 def has_call(trace, expected):
     for event in trace:
         if event.get("operation") != expected["operation"]:
