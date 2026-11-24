@@ -24,7 +24,7 @@ a time.
 - **The Kismet connection**, configured automatically. Sign in
   with your Kismet manager account when prompted; everything is scoped to the
   collections you manage.
-- **Operating skills.** The [installed skill directory](plugins/kismet-operators/skills) contains the customer workflows for demand, advertising, journey analysis, catalog, guest CRM, reporting, sender setup, webhooks and ICND pages. Sender setup verifies readiness. Customer campaign authoring depends on the operations available to the signed-in account.
+- **Operating skills.** The [installed skill directory](plugins/kismet-operators/skills) contains the customer workflows for demand, advertising, journey analysis, catalog, guest CRM, reporting, email drafting and sender setup, webhooks, and ICND pages. The [email draft skill](plugins/kismet-operators/skills/kismet-email-drafts/SKILL.md) prepares copy for the intended audiences and explains where to review it. Saving a campaign depends on the operations available to the signed-in account.
 
 ## Test an operator workflow
 
