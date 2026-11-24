@@ -12,8 +12,12 @@ def read_run(path):
         raise ValueError(f"{path}: incomplete run")
     runs = records[1:-1]
     trials = {(r["case"], r["repeat"]) for r in runs}
-    if len(trials) != len(runs) or len(trials) != records[-1]["summary"]["total"]:
+    if not runs or len(trials) != len(runs):
         raise ValueError(f"{path}: missing or repeated trial")
+    expected = {"total": len(runs), "behavior_pass": sum(r["behavior_pass"] for r in runs),
+                "task_completed": sum(r["task_completed"] for r in runs), "errors": sum("error" in r for r in runs)}
+    if records[-1]["summary"] != expected:
+        raise ValueError(f"{path}: summary does not match trial records")
     return records[0]["run"], runs
 
 
@@ -31,6 +35,8 @@ def summarize(runs):
         "failures": dict(Counter(f for r in runs for f in r.get("failures", []))),
         "by_case": {case: [sum(r["behavior_pass"] for r in group), len(group)]
                     for case, group in cases.items()},
+        "jobs_by_case": {case: [sum(r["task_completed"] for r in group), len(group)]
+                         for case, group in cases.items()},
     }
 
 
@@ -44,10 +50,10 @@ def main():
         meta, runs = read_run(path)
         configurations.add(tuple(meta.get(k) for k in ("catalog_sha256", "cases_sha256", "skills_sha256",
                                                        "system_sha256", "runner_sha256", "grader_sha256")) +
-                           (tuple(sorted({r["case"] for r in runs})), meta["temperature"], meta.get("max_tokens", 1400)))
+                           (tuple(sorted((r["case"], r["repeat"]) for r in runs)), meta["temperature"], meta.get("max_tokens", 1400)))
         rows.append({"file": path.name, "model": meta["model"], "surface": meta["surface"], **summarize(runs)})
     if len(configurations) != 1:
-        parser.error("Catalog, cases, skills, runner, instructions, sampling temperature or selected cases differ")
+        parser.error("Use matching catalogs, cases, skills, runners, instructions, sampling settings and repetitions")
     print(json.dumps(rows, indent=2))
 
 

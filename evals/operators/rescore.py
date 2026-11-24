@@ -35,7 +35,7 @@ def main():
     if meta["cases_sha256"] != digest(SUITES[meta.get("suite", "field")]):
         parser.error("The frozen cases differ from this checkout")
     base = Path(__file__).resolve().parent
-    rubric = digest({n: (base / n).read_text() for n in ("grade.py", "candidate.py", "revised.py")})
+    rubric = digest({n: (base / n).read_text() for n in ("grade.py", "candidate.py", "revised.py", "run.py")})
     metadata = {**meta, "regraded_from": args.source.name, "grader_sha256": rubric}
     results = [rescore(r, meta["surface"]) for r in rows]
     counts = Counter(total=len(results), behavior_pass=sum(r["behavior_pass"] for r in results),
