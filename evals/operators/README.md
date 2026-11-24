@@ -70,3 +70,23 @@ python evals/operators/run.py --model YOUR_MODEL --surface revised --max-tokens 
 ```
 
 The transfer suite changes the phrasing and requested outcome. It checks a source-and-time handoff, an owner-facing sentence when live data is unavailable, and a preview-only request where persisting even a valid draft fails. Keep transfer scores separate from the ten historical field questions.
+
+### Explicit saves and owner-facing status
+
+The [frozen comparison protocol](workflow-protocol.md) covers the two workflow changes. The control uses the prior preview receipt. The experiment replaces that operation with one direct, unscheduled batch save and adds a forwardable sentence only when Meta cannot confirm delivery. Both use the same existing skills. The schema models whole-dollar USD credits for this experiment. All accounts and writes are in memory.
+
+Run each model and arm using the local runner. For example, with a local 4B model loaded under the alias `operator-workflows-4b`:
+
+```sh
+python evals/operators/workflow_pair.py --model operator-workflows-4b --arm receipt --output /tmp/4b-receipt.jsonl
+python evals/operators/workflow_pair.py --model operator-workflows-4b --arm explicit --output /tmp/4b-explicit.jsonl
+```
+
+Use the corresponding `operator-workflows-20b` alias and `20b-ARM.jsonl` filenames for the second model. After all four runs, prepare a label-blind review packet and join the decisions:
+
+```sh
+python evals/operators/review/paired.py /tmp /tmp/blind.jsonl
+python evals/operators/review/paired.py /tmp /tmp/scored.jsonl --decisions /tmp/decisions.json
+```
+
+The JSON decisions object maps each opaque item ID to a boolean `pass` and a short `reason`. Review against the frozen protocol. A state failure or runtime error still fails the trial. Retain the raw packet and review decisions. For an independent release set, have a second person select fresh, redacted operator questions from a later period. Keep each customer conversation and its paraphrases together in one split. Keep those cases outside the public repo until the contract and scorer are frozen. After revealing a set, use it for regression coverage and draw a new one for the next release decision.
