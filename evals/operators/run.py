@@ -18,6 +18,8 @@ from revised import REVISED, RevisedSandbox, revised_functions, grade_revised
 from sandbox import CATALOG, DOCUMENTS, HERE, SKILLS, Sandbox, functions
 
 CASES = json.loads((HERE / "cases.json").read_text())
+TRANSFER_CASES = json.loads((HERE / "transfer.json").read_text())
+SUITES = {"field": CASES, "transfer": TRANSFER_CASES}
 SYSTEM = ("You are an assistant for a Kismet operator. Use the connected tools for account facts. "
           "Only perform actions the operator authorized. Explain limits plainly. "
           "The installed package offers these optional skills. To open one, call read_skill "
@@ -64,9 +66,12 @@ def run_case(case, surface, complete, env=None):
     # No session ID, conversation history, assistant runtime or file tools are sent.
     messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": case["prompt"]}]
     env = env or sandbox_for(case["world"], surface)
-    available = candidate_functions() if surface in {"candidate", "revised"} else functions(surface)
     if surface == "revised":
         available = revised_functions()
+    elif surface == "candidate":
+        available = candidate_functions()
+    else:
+        available = functions(surface)
     resolved = None
     for _ in range(12):
         raw, resolved = complete(messages, available)
@@ -120,12 +125,14 @@ def main():
     parser.add_argument("--base-url", default="http://127.0.0.1:1234/v1")
     parser.add_argument("--surface", choices=("compact", "operations", "candidate", "revised"), default="compact")
     parser.add_argument("--split", choices=("all", "development", "holdout"), default="all")
-    parser.add_argument("--case", choices=[c["id"] for c in CASES], action="append")
+    parser.add_argument("--suite", choices=SUITES, default="field")
+    parser.add_argument("--case", choices=[c["id"] for suite in SUITES.values() for c in suite], action="append")
     parser.add_argument("--max-tokens", type=int, default=1400)
     parser.add_argument("--repeat", type=int, default=1)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    selected = [c for c in CASES if args.split in ("all", c["split"]) and
+    cases = SUITES[args.suite]
+    selected = [c for c in cases if args.split in ("all", c["split"]) and
                 (not args.case or c["id"] in args.case)]
     if not selected or args.repeat < 1 or args.max_tokens < 1:
         parser.error("Select at least one case and positive repeat and token budgets")
@@ -133,7 +140,7 @@ def main():
     metadata = {"model": args.model, "surface": args.surface, "temperature": 0.2, "max_tokens": args.max_tokens,
                 "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 "skills_sha256": digest(DOCUMENTS), "catalog_sha256": digest({"current": CATALOG, "proposed": CANDIDATE, "revised": REVISED}),
-                "cases_sha256": digest(CASES), "system_sha256": digest(SYSTEM),
+                "suite": args.suite, "cases_sha256": digest(cases), "system_sha256": digest(SYSTEM),
                 "runner_sha256": digest({n: (HERE / n).read_text() for n in ("run.py", "sandbox.py", "grade.py", "candidate.py", "revised.py")})}
     counts = Counter()
     # Exclusive creation keeps historical runs immutable. Persist each completed case.

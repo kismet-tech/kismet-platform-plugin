@@ -5,9 +5,9 @@ from collections import Counter
 from pathlib import Path
 
 from report import read_run
-from run import CASES, digest, sandbox_for, score_answer
+from run import SUITES, digest, sandbox_for, score_answer
 
-BY_ID = {case["id"]: case for case in CASES}
+BY_ID = {case["id"]: case for cases in SUITES.values() for case in cases}
 
 
 def rescore(row, surface):
@@ -32,7 +32,7 @@ def main():
     parser.add_argument("output", type=Path)
     args = parser.parse_args()
     meta, rows = read_run(args.source)
-    if meta["cases_sha256"] != digest(CASES):
+    if meta["cases_sha256"] != digest(SUITES[meta.get("suite", "field")]):
         parser.error("The frozen cases differ from this checkout")
     base = Path(__file__).resolve().parent
     rubric = digest({n: (base / n).read_text() for n in ("grade.py", "candidate.py", "revised.py")})

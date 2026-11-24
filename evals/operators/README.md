@@ -53,3 +53,20 @@ Run the same command with `--surface candidate` to test the proposed 24 named op
 The synthetic implementation covers the selected field jobs. A saved draft requires an exact prior preview, separate saved audiences and no scheduling. The scorer checks both stored bodies. The Meta advertising section in this proposal lacks live campaign status and matched booking counts. A truthful limitation may pass the behavior check while leaving the operator's job incomplete. Other fixture operations without supporting data return an explicit fixture limitation. Compare this profile against a named control with the same context budget.
 
 If manual review reveals a scoring error, add a grader regression test. Use `python evals/operators/rescore.py ORIGINAL.jsonl NEW.jsonl` to preserve the original and score the same answers again. The replay checks that the case definitions and observed tool replies still match. This runs locally without calling a model.
+
+## Compare the revised Operator contract
+
+Use `--surface candidate` for the first 24-tool proposal and `--surface revised` for the revision. Use the same local model, context, `--max-tokens`, suite and repeat count in both runs. Both arms load the skills in the current checkout. For the original model and skill snapshot, use the November 24 baseline commit.
+
+The revised ads report returns a live provider state, its check time, and a separately labeled stored state. The fallback leaves the live fields empty. Meta attribution carries both provider purchases and matched bookings for each campaign. The timestamp is the fixture's simulated observation time.
+
+The revised draft operation accepts one or more variants in a single preview. Any call containing variants only previews them. Saving takes the preview receipt scoped to the collection and session, is idempotent, and returns a draft ID per audience. The draft test checks the persisted bodies, offer assignment and returned IDs. A successful save has no delivery effect. The connection's current customer email-authoring restriction is still covered by the compact and named controls.
+
+```sh
+python evals/operators/run.py --model YOUR_MODEL --surface revised --max-tokens 3000 \
+  --repeat 2 --output /tmp/operator-revised.jsonl
+python evals/operators/run.py --model YOUR_MODEL --surface revised --max-tokens 3000 \
+  --suite transfer --repeat 2 --output /tmp/operator-transfer.jsonl
+```
+
+The transfer suite changes the phrasing and requested outcome. It checks a source-and-time handoff, an owner-facing sentence when live data is unavailable, and a preview-only request where persisting even a valid draft fails. Keep transfer scores separate from the ten historical field questions.

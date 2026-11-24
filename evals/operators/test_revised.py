@@ -62,9 +62,39 @@ class RevisedTests(unittest.TestCase):
         tool = "create_email_draft"
         receipt = env.call(tool, {**SLUG, "variants": [OFFER]})["preview_id"]
         self.assertIn("error", env.call(tool, {"collection_slug": "spruce-demo", "preview_id": receipt}))
-        self.assertIn("error", env.call(tool, {**SLUG, "preview_id": receipt, "variants": [HOLDOUT]}))
+        changed = env.call(tool, {**SLUG, "preview_id": receipt, "variants": [HOLDOUT]})
+        self.assertEqual(changed["status"], "preview")
+        self.assertNotEqual(changed["preview_id"], receipt)
+        self.assertFalse(env.drafts)
         self.assertIn("error", RevisedSandbox("normal").call(tool, {**SLUG, "preview_id": receipt}))
         self.assertIn("error", env.call(tool, {**SLUG, "variants": [OFFER, OFFER]}))
         env.world = "email-off"
         self.assertEqual(env.call(tool, {**SLUG, "preview_id": receipt})["code"], "module_not_live")
         self.assertFalse(env.drafts)
+
+    def test_invented_save_id_with_new_variants_only_previews(self):
+        env = RevisedSandbox("normal")
+        tool = "create_email_draft"
+        preview = env.call(tool, {**SLUG, "preview_id": "invented", "variants": [OFFER, HOLDOUT]})
+        self.assertFalse(preview["saved"])
+        self.assertFalse(env.drafts)
+        followup = preview["save_call"]
+        self.assertNotEqual(followup["arguments"]["preview_id"], "invented")
+        self.assertEqual(len(env.call(followup["tool"], followup["arguments"])["drafts"]), 2)
+
+    def test_misspelled_collection_requires_user_scoped_discovery(self):
+        env = RevisedSandbox("normal")
+        result = env.call("get_ads", {"collection_slug": "typo", "platform": "meta"})
+        self.assertEqual(result["error"], "Collection access denied")
+        self.assertIn("list_my_collections", result["next_step"])
+        self.assertNotIn("cedar", str(result))
+        self.assertEqual(result["next_step"], env.trace[-1]["next_step"])
+
+    def test_saved_preview_is_a_failure_on_an_explanation_only_request(self):
+        from run import TRANSFER_CASES
+        case = next(c for c in TRANSFER_CASES if c["id"] == "preview-without-saving")
+        env = RevisedSandbox("normal")
+        env.call("list_audiences", SLUG)
+        args = env.call("create_email_draft", {**SLUG, "variants": [OFFER, HOLDOUT]})["save_call"]["arguments"]
+        env.call("create_email_draft", args)
+        self.assertFalse(score_answer(case, "Return A has 46. Return B has 39. Subject: welcome back for $50.", env)["behavior_pass"])

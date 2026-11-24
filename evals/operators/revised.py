@@ -24,14 +24,14 @@ variant = {"type": "object", "properties": {k: text_field for k in ("audience_id
            "required": ["audience_id", "subject", "body"], "additionalProperties": False}
 REVISED["create_email_draft"] = {
     "description": "Prepare one or more unscheduled email drafts. Look up saved audiences with list_audiences. "
-                   "Preview by passing variants, one per audience. To save the preview as reviewable drafts, "
+                   "Passing variants always returns a preview, even if a preview ID is supplied. To save the preview as reviewable drafts, "
                    "call again with its preview_id and omit variants. Saving returns draft IDs. Nothing sends. "
                    "A request just to preview ends after the first call.",
     "inputSchema": {"type": "object", "properties": {
         "collection_slug": text_field,
         "variants": {"type": "array", "minItems": 1, "maxItems": 10, "items": variant},
         "preview_id": text_field}, "required": ["collection_slug"], "additionalProperties": False,
-        "oneOf": [{"required": ["variants"]}, {"required": ["preview_id"]}]}
+        "anyOf": [{"required": ["variants"]}, {"required": ["preview_id"]}]}
 }
 
 
@@ -45,6 +45,14 @@ class RevisedSandbox(CandidateSandbox):
     def __init__(self, world):
         super().__init__(world, "revised")
         self.batches = {}
+
+    def call(self, name, args):
+        result = super().call(name, args)
+        if result.get("error") == "Collection access denied":
+            guidance = "Check the spelling against list_my_collections. Only retry for the exact collection the operator requested."
+            self.trace[-1]["next_step"] = guidance
+            return {**result, "next_step": guidance}
+        return result
 
     def dispatch(self, name, args, event):
         if name not in {"get_ads", "create_email_draft"}:
@@ -90,7 +98,7 @@ class RevisedSandbox(CandidateSandbox):
     def email_batch(self, args):
         if self.world == "email-off":
             return self.email_blocker()
-        if "preview_id" in args:
+        if "variants" not in args:
             items = self.batches.get(args["preview_id"])
             if items is None:
                 raise ValueError("Unknown preview for this collection and session")
@@ -103,7 +111,8 @@ class RevisedSandbox(CandidateSandbox):
         previews = [self.draft(item) for item in items]
         preview_id = sha256(json.dumps(items, sort_keys=True).encode()).hexdigest()[:16]
         self.batches[preview_id] = items
-        return {"status": "preview", "preview_id": preview_id, "variants": previews,
+        return {"status": "preview", "preview_id": preview_id, "variants": previews, "saved": False,
+                "save_call": {"tool": "create_email_draft", "arguments": {"collection_slug": COLLECTION, "preview_id": preview_id}},
                 "next_step": "To save these unscheduled drafts call create_email_draft with collection_slug and preview_id."}
 
 
