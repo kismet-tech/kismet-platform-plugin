@@ -2,7 +2,7 @@
   "mcpServers": {
     "kismet-operators": {
       "type": "http",
-      "url": "https://mcp.kismet.travel/user-mcp"
+      "url": "https://kismet.travel/user-mcp"
     }
   }
 }

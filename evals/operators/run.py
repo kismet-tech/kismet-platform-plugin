@@ -11,6 +11,7 @@ import urllib.request
 from collections import Counter
 from pathlib import Path
 
+from candidate import CANDIDATE, CandidateSandbox, candidate_functions, grade_candidate
 from grade import grade
 from sandbox import CATALOG, DOCUMENTS, HERE, SKILLS, Sandbox, functions
 
@@ -51,11 +52,15 @@ def model_client(base_url, model):
     return complete
 
 
+def sandbox_for(world, surface):
+    return CandidateSandbox(world) if surface == "candidate" else Sandbox(world, surface)
+
+
 def run_case(case, surface, complete, env=None):
     # No session ID, conversation history, assistant runtime or file tools are sent.
     messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": case["prompt"]}]
-    env = env or Sandbox(case["world"], surface)
-    available = functions(surface)
+    env = env or sandbox_for(case["world"], surface)
+    available = candidate_functions() if surface == "candidate" else functions(surface)
     resolved = None
     for _ in range(12):
         raw, resolved = complete(messages, available)
@@ -64,8 +69,9 @@ def run_case(case, surface, complete, env=None):
         if not calls:
             if not answer.strip():
                 raise ValueError("empty final answer")
+            score = grade_candidate(case, answer, env) if surface == "candidate" else grade(case, answer, env.trace)
             return {"answer": answer, "model_returned": resolved, "trace": env.trace,
-                    **grade(case, answer, env.trace)}
+                    **score}
         if len(calls) + len(env.trace) > 24:
             raise ValueError("tool-call budget reached")
         messages.append({"role": "assistant", "content": answer, "tool_calls": calls})
@@ -90,7 +96,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True)
     parser.add_argument("--base-url", default="http://127.0.0.1:1234/v1")
-    parser.add_argument("--surface", choices=("compact", "operations"), default="compact")
+    parser.add_argument("--surface", choices=("compact", "operations", "candidate"), default="compact")
     parser.add_argument("--split", choices=("all", "development", "holdout"), default="all")
     parser.add_argument("--case", choices=[c["id"] for c in CASES], action="append")
     parser.add_argument("--repeat", type=int, default=1)
@@ -103,16 +109,16 @@ def main():
     complete = model_client(args.base_url, args.model)
     metadata = {"model": args.model, "surface": args.surface, "temperature": 0.2,
                 "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-                "skills_sha256": digest(DOCUMENTS), "catalog_sha256": digest(CATALOG),
+                "skills_sha256": digest(DOCUMENTS), "catalog_sha256": digest({"current": CATALOG, "proposed": CANDIDATE}),
                 "cases_sha256": digest(CASES), "system_sha256": digest(SYSTEM),
-                "runner_sha256": digest({n: (HERE / n).read_text() for n in ("run.py", "sandbox.py", "grade.py")})}
+                "runner_sha256": digest({n: (HERE / n).read_text() for n in ("run.py", "sandbox.py", "grade.py", "candidate.py")})}
     counts = Counter()
     # Exclusive creation keeps historical runs immutable. Persist each completed case.
     with args.output.open("x") as stream:
         print(json.dumps({"run": metadata}), file=stream, flush=True)
         for repeat in range(1, args.repeat + 1):
             for case in selected:
-                env = Sandbox(case["world"], args.surface)
+                env = sandbox_for(case["world"], args.surface)
                 try:
                     result = run_case(case, args.surface, complete, env)
                 except (OSError, ValueError, KeyError, IndexError, TypeError) as err:

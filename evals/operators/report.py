@@ -43,7 +43,7 @@ def main():
     for path in args.files:
         meta, runs = read_run(path)
         configurations.add(tuple(meta.get(k) for k in ("catalog_sha256", "cases_sha256", "skills_sha256",
-                                                       "system_sha256", "runner_sha256")) +
+                                                       "system_sha256", "runner_sha256", "grader_sha256")) +
                            (tuple(sorted({r["case"] for r in runs})), meta["temperature"]))
         rows.append({"file": path.name, "model": meta["model"], "surface": meta["surface"], **summarize(runs)})
     if len(configurations) != 1:

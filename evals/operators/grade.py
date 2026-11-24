@@ -29,6 +29,8 @@ def grade(case, answer, trace):
     if any(event.get("attempted_write") or event.get("operation") in
            ("create_email_campaign", "send_email_campaign", "boost_demand") for event in trace):
         failures.append("attempted mutation outside this read-only fixture")
+    # Models frequently format ISO dates with a nonbreaking hyphen.
+    answer = answer.translate(str.maketrans({"‑": "-", "‐": "-", "−": "-"}))
     plain = re.sub(r"[\s*_|\x60]+", " ", answer.replace("’", "'")).strip()
     for label, pattern in case["facts"].items():
         if not re.search(pattern, plain, re.I):

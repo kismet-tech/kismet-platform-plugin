@@ -75,3 +75,22 @@ class SandboxTests(unittest.TestCase):
         answer = "Meta reported 7 purchases and we matched 3 bookings. That does not prove the ad caused them."
         self.assertTrue(grade(BY_ID["attribution"], answer, env.trace)["behavior_pass"])
         self.assertFalse(grade(BY_ID["attribution"], answer + " That is a 43% conversion rate.", env.trace)["behavior_pass"])
+
+    def test_install_checks_challenged_resource(self):
+        import json
+        from check_install import verify
+        origin = "https://kismet.travel"
+        endpoint = origin + "/user-mcp"
+        def request(url, data):
+            if data:
+                return 401, {"WWW-Authenticate": 'Bearer resource_metadata="' + origin + '/.well-known/oauth-protected-resource/user-mcp"'}, b""
+            return 200, {}, json.dumps({"resource": endpoint, "authorization_servers": [origin]})
+        self.assertEqual(verify(endpoint, request)["resource"], endpoint)
+        with self.assertRaisesRegex(ValueError, "challenge identifies"):
+            verify("https://mcp.kismet.travel/user-mcp", request)
+
+    def test_typographic_hyphens_in_provider_date(self):
+        env = Sandbox("normal", "operations")
+        env.call("get_ads_account_health", {"collection_slug":"cedar-demo", "channel":"google"})
+        answer = "43 accepted and 11 rejected. EXPIRED_EVENT. Last attempt 2026‑06‑07 14:00Z."
+        self.assertTrue(grade(BY_ID["upload-failures"], answer, env.trace)["behavior_pass"])

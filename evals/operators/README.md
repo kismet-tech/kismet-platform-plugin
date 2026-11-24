@@ -43,3 +43,13 @@ Review the actual answers alongside the machine checks. In particular, verify so
 The evaluation design follows the [OpenAI evaluation guide](https://developers.openai.com/api/docs/guides/evaluation-best-practices).
 
 To compare complete runs, use `python evals/operators/report.py /tmp/operators-compact.jsonl /tmp/operators-named.jsonl`. It checks the skills, catalog, case and runner fingerprints, selected cases and temperature before showing totals, per-case passes, repeated-trial consistency and runtime failures. Model output is stochastic even with fixed temperature. Rerun after changes and retain the earlier file for a dated baseline. Use separate reports when one of the fingerprints changes.
+
+For a separate anonymous installation preflight, run `python evals/operators/check_install.py`. It reads the actual packaged URL, sends a credential-free tool-list request, follows the metadata link in the 401 challenge, and verifies that the identified resource matches the install. A passing preflight covers the challenge step only. Completing OAuth and executing a scoped operation require a signed-in customer session.
+
+## Proposed 24-tool contract
+
+Run the same command with `--surface candidate` to test the proposed 24 named operations. This model-only experiment reuses the public skill index. The 23 unchanged descriptors come from the 25-tool benchmark. The shared `get_collection_status` replaces booking readiness and email sender status. The full schemas plus the skill reader use about 51 KB before conversation history. Choose a model context large enough to test the whole catalog and record that size.
+
+The synthetic implementation covers the selected field jobs. A saved draft requires an exact prior preview, separate saved audiences and no scheduling. The scorer checks both stored bodies. The Meta advertising section in this proposal lacks live campaign status and matched booking counts. A truthful limitation may pass the behavior check while leaving the operator's job incomplete. Other fixture operations without supporting data return an explicit fixture limitation. Compare this profile against a named control with the same context budget.
+
+If manual review reveals a scoring error, add a grader regression test. Use `python evals/operators/rescore.py ORIGINAL.jsonl NEW.jsonl` to preserve the original and score the same answers again. The replay checks that the case definitions and observed tool replies still match. This runs locally without calling a model.
