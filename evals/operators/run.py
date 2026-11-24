@@ -62,16 +62,17 @@ def sandbox_for(world, surface):
     return CandidateSandbox(world) if surface == "candidate" else Sandbox(world, surface)
 
 
-def run_case(case, surface, complete, env=None):
+def run_case(case, surface, complete, env=None, available=None, scorer=None):
     # No session ID, conversation history, assistant runtime or file tools are sent.
     messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": case["prompt"]}]
     env = env or sandbox_for(case["world"], surface)
-    if surface == "revised":
-        available = revised_functions()
-    elif surface == "candidate":
-        available = candidate_functions()
-    else:
-        available = functions(surface)
+    if available is None:
+        if surface == "revised":
+            available = revised_functions()
+        elif surface == "candidate":
+            available = candidate_functions()
+        else:
+            available = functions(surface)
     resolved = None
     for _ in range(12):
         raw, resolved = complete(messages, available)
@@ -80,7 +81,7 @@ def run_case(case, surface, complete, env=None):
         if not calls:
             if not answer.strip():
                 raise ValueError("empty final answer")
-            score = score_answer(case, answer, env)
+            score = (scorer or score_answer)(case, answer, env)
             return {"answer": answer, "model_returned": resolved, "trace": env.trace,
                     **score}
         if len(calls) + len(env.trace) > 24:
