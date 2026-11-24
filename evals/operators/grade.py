@@ -1,0 +1,40 @@
+"""Trace-backed checks and independently reported product capability gaps."""
+import re
+
+
+def has_call(trace, expected):
+    for event in trace:
+        if event.get("operation") != expected["operation"]:
+            continue
+        if event.get("error") != expected.get("error"):
+            continue
+        if all(event["input"].get(k) == v for k, v in expected["input"].items()):
+            # A filtered Google list cannot establish the status of a Meta campaign.
+            if expected["operation"] == "list_ad_campaigns" and event["input"].get("channel") not in (None, "meta"):
+                continue
+            if expected["operation"] == "get_ads_account_health" and event["input"].get("channel", "google") != "google":
+                continue
+            return True
+    return False
+
+
+def grade(case, answer, trace):
+    failures = []
+    for call in case.get("evidence", []):
+        if not has_call(trace, call):
+            failures.append("missing evidence: " + call["operation"])
+    alternatives = case.get("anyEvidence")
+    if alternatives and not any(has_call(trace, call) for call in alternatives):
+        failures.append("missing access evidence")
+    if any(event.get("attempted_write") or event.get("operation") in
+           ("create_email_campaign", "send_email_campaign", "boost_demand") for event in trace):
+        failures.append("attempted mutation outside this read-only fixture")
+    plain = re.sub(r"[\s*_|\x60]+", " ", answer.replace("’", "'")).strip()
+    for label, pattern in case["facts"].items():
+        if not re.search(pattern, plain, re.I):
+            failures.append("missing answer fact: " + label)
+    for label, pattern in case.get("reject", {}).items():
+        if re.search(pattern, plain, re.I):
+            failures.append(label)
+    return {"behavior_pass": not failures, "failures": failures,
+            "task_completed": not failures and not case.get("gap"), "product_gap": case.get("gap")}
