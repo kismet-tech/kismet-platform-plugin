@@ -1,0 +1,746 @@
+{
+  "compact": {
+    "search": {
+      "description": "Find actions by task words (query), or browse with an empty query and offset. Returns up to five summaries. Then search with operation set to the chosen ID to read its COMPLETE input schema, warnings and output rules. Search is discovery, not permission. Call execute with that operation ID and input.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "operation": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "offset": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+    },
+    "execute": {
+      "description": "Run one action using its operation ID and input. First retrieve the complete definition with search({operation: ID}). Follow its permissions, preview, confirmation and approval rules. Existing instructions naming an individual tool refer to operation IDs for this tool. This tool can change data, publish, delete or contact external systems depending on the selected action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "input": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "operation"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+    }
+  },
+  "operations": {
+    "list_my_collections": {
+      "description": "List the collections you can manage, each with its group count, published-group-page count, property count, and branding (logo URL + brand colors — use these to brand reports and other client-facing artifacts; never pull branding from a guest surface). Start here to see your portfolio before browsing or editing groups and properties.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "title": "List my collections",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "title": "List my collections"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number"
+          },
+          "collections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "collectionType": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": "string"
+                },
+                "groupCount": {
+                  "type": "number"
+                },
+                "publishedGroupCount": {
+                  "type": "number"
+                },
+                "propertyCount": {
+                  "type": "number"
+                },
+                "branding": {
+                  "type": "object",
+                  "description": "Collection brand identity: logoUrl (primary mark; squareLogoUrl reserved for a square variant when one exists), ctaColor (accent hex), ctaTextColor.",
+                  "properties": {
+                    "logoUrl": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "squareLogoUrl": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "ctaColor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "ctaTextColor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "slug",
+                "name"
+              ]
+            }
+          }
+        },
+        "required": [
+          "count",
+          "collections"
+        ]
+      },
+      "instruction": "Call execute with this operation and input. Preserve this action’s approval and confirmation rules."
+    },
+    "list_ad_campaigns": {
+      "description": "List a collection's paid campaigns across every ad channel — type, target, status, mode, bidding, and daily budget. Orientation before drilling into performance/attribution. Read-only. ONE row per logical campaign (Google ad-group detail rides adGroupTargets). Google rows carry managedBy: 'kismet' (created here, uuid id, editable) or 'client' (built in Google Ads, numeric id, with a 30-day spend window; the daily budget is editable here via update_ad_campaign, everything else in Google Ads). Omit channel for ALL channels (each row carries its own channel); pass channel: 'google', 'openai' (ChatGPT), or 'meta' (Facebook/Instagram) to filter to one. OpenAI rows carry `ads[]`: every ad in the campaign with its title, body and image URL, plus its own review status, for report-outs and decks. Meta rows read their status live from Meta (statusSource 'meta'; effectiveStatus says whether it can serve), else Kismet's record ('kismet_record').",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "description": "A collection you have access to."
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "google",
+              "openai",
+              "meta"
+            ],
+            "description": "Optional filter. Omit for all channels; 'google', 'openai' (ChatGPT Ads), or 'meta' (Facebook/Instagram) to narrow."
+          },
+          "include_archived": {
+            "type": "boolean",
+            "description": "Include archived campaigns (default false)."
+          }
+        },
+        "required": [
+          "collection_slug"
+        ],
+        "additionalProperties": false
+      },
+      "title": "Ads: list campaigns",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "title": "List ad campaigns"
+      },
+      "instruction": "Call execute with this operation and input. Preserve this action’s approval and confirmation rules."
+    },
+    "get_ads_attribution": {
+      "description": "Deterministic campaign attribution for a collection's paid ads — confirmed bookings whose own ad click came at or before the booking and within 90 days of it, grouped by campaign with revenue, each flagged owned (managed under our MCC) vs external (an account we do not manage yet). The source-of-truth for 'which ad brought this booking'. Each campaign row carries campaignName, campaignType and managedBy ('kismet' or 'client'). Two money bases, both labelled: revenueUsd is HOST PAYOUT (what the owner receives; the upload basis) and stayValueUsd is STAY VALUE (fare plus cleaning plus fees, no taxes; the client-facing basis, use it in anything a client reads). Bookings taken on an OTA after the click are assistedBookings, beside the return and never inside it. Neither is cash collected so far. Read-only. channel='google' (default) reads Kismet's own click on the booking's own session. channel='meta' is a different basis and is labelled basis='meta_reported': Meta's own reported purchases (7-day click and 1-day view windows) matched onto Kismet bookings, because a Meta click usually lands in the in-app browser and the booking comes later from another session Kismet cannot join. A booking is named first from the receipt of the Purchase Kismet sent Meta for it, paired to Meta's purchase to the cent (matchedBy 'receipt'); a purchase with no paired receipt falls back to day and host payout (matchedBy 'day_and_value'). Each Meta campaign row keeps metaReported (what Meta counted, click and view apart; never add them) beside bookings (what matched), plus unmatchedPurchases Meta reported that no booking explains; matches lists each booking with its window, and receiptMatchedBookings counts those named from a receipt. A second basis, guestSessionCredits (basis guest_session), lists bookings whose booker had a Meta click on another of their own sessions within guestSessionLookbackDays, Kismet's own evidence of a Meta touch on the journey; multitouchBookings is the union of both bases, each booking once. Meta-assisted bookings are reported beside Google, never inside it, and never uploaded.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "description": "A collection you have access to."
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "google",
+              "meta"
+            ],
+            "description": "Ad channel. 'google' (default): Kismet's own-session click. 'meta': Meta's reported purchases matched onto bookings (basis meta_reported). Email coming."
+          },
+          "days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 365,
+            "description": "Lookback window in days (default 30)."
+          }
+        },
+        "required": [
+          "collection_slug"
+        ],
+        "additionalProperties": false
+      },
+      "title": "Ads: attribution (which ad drove the booking)",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "title": "Ads attribution"
+      },
+      "instruction": "Call execute with this operation and input. Preserve this action’s approval and confirmation rules."
+    },
+    "get_ads_account_health": {
+      "description": "Whether a collection's ad account on one channel can actually deliver and learn from bookings. channel='google' (default): manager link, billing, the Kismet Purchase conversion action (enabled and primary), customer data terms, AW tag, uploads accepted in the last 7 days, goal biddability, identity verification; `overall: 'block'` means update_ad_campaign {status: 'ENABLED'} will refuse with the same blockers. channel='meta': ad account and partner access, billing (Meta funding or the Kismet wallet), Facebook Page assignment, Instagram identity, pixel signal (ViewContent and Purchase over 7 days), catalog freshness, product set, OAuth scopes, and campaigns that cannot deliver (an ACTIVE campaign with no ad never serves). Every field carries a status (ok, warn, block) and a remedy; read `blockers` first. Read-only. Pass refresh: true right after an admin clears a Google chore in the Google Ads UI. Meta only: probe_product_set_filter: true also replays every group's product set filter against the catalog with read-only searches and returns Meta's verbatim reply per group (`productSetFilterProbe`; KIS-18820).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "description": "A collection you have access to."
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "google",
+              "meta"
+            ],
+            "description": "Ad channel: 'google' (default) or 'meta' (Facebook/Instagram)."
+          },
+          "probe_product_set_filter": {
+            "type": "boolean",
+            "description": "Meta only. Replay each group's product set filter as a read-only catalog search, per token (entity and system user), and return Meta's verbatim reply. Slower: two Graph reads per group."
+          },
+          "refresh": {
+            "type": "boolean",
+            "description": "Google only. Bypass the account-chores cache (throttled to once a minute per account). Use right after the customer data terms or identity verification were cleared in the UI."
+          }
+        },
+        "required": [
+          "collection_slug"
+        ],
+        "additionalProperties": false
+      },
+      "title": "Ads: account health",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "title": "Ads account health"
+      },
+      "instruction": "Call execute with this operation and input. Preserve this action’s approval and confirmation rules."
+    },
+    "get_email_sender_status": {
+      "description": "Read whether Kismet can send email as one of this collection's domains: the domain, whether it is a Cloudflare zone the collection's stored grant can edit (then setup writes the records itself), or not (then setup hands back records to add at the DNS host), and whether SendGrid has authenticated it. Requires collection ADMIN. Optional domain must be one of the collection's own (site, Cloudflare zone, website or contact email). Reads only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "minLength": 1
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 253
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "One of the collection's own domains (its site, Cloudflare zone, website or contact email). Omit to use the serving domain, else the zone."
+          }
+        },
+        "required": [
+          "collection_slug"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "title": "Read email sender setup",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "instruction": "Call execute with this operation and input. Preserve this action’s approval and confirmation rules."
+    },
+    "list_audiences": {
+      "description": "List a collection's saved guest audiences with live value stats (guests, bookings, lifetime revenue), reach (reachable = real email; mailable = real email AND marketing consent; members = an active membership in the collection, opted in or not; adMatchable = email or phone, the hashed Customer Match ceiling; stats.sendReach = the number a campaign to this audience SENDS to right now, from the send resolver. Size a send by sendReach, never by mailable: a rule with no filters sends to every marketing-consented member, list and Wi-Fi imports with no stay included, while guests/mailable describe only the guestbook rows with a stay), the saved rule, trend history, and where each audience is used (email campaigns, perks). DYNAMIC rules re-evaluate live — rolling windows move with the calendar. Each row carries statsFreshness: {source:\"live\"} or {source:\"snapshot\", asOf:\"YYYY-MM-DD\"} when the numbers came from that night's sweep because the request's live-evaluation budget was spent. A snapshot row carries nights/reachable/members/clv from that night (rows written before 2026-10-21 have them null); sendReach is never persisted and is null from a snapshot. Re-read one audience with preview_audience for live values.",
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "collection_slug"
+        ],
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "description": "Collection to list audiences for."
+          }
+        }
+      },
+      "title": "List audiences",
+      "annotations": {
+        "title": "List audiences",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "instruction": "Call execute with this operation and input. Preserve this action’s approval and confirmation rules."
+    },
+    "set_ad_campaign_status": {
+      "description": "Pause a paid campaign (stop its spend). PAUSE-ONLY from this surface — activating a campaign is spend authorization and stays human-only (dashboard) until the drafts/autonomy release. WRITE — admin/member role. channel='meta'. Campaign ids come from list_ad_campaigns.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "description": "A collection you can manage."
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "meta"
+            ],
+            "description": "Ad channel. 'meta'."
+          },
+          "campaign_id": {
+            "type": "string",
+            "description": "The campaign id (from list_ad_campaigns, channel='meta')."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PAUSED"
+            ],
+            "description": "Only PAUSED is allowed from the agent surface."
+          }
+        },
+        "required": [
+          "collection_slug",
+          "campaign_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "title": "Ads: pause campaign",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "title": "Pause ad campaign"
+      },
+      "instruction": "Call execute with this operation and input. Preserve this action’s approval and confirmation rules."
+    },
+    "award_discount_perk": {
+      "description": "Preview or award a personal dollar or percentage booking discount to one known guest or a saved audience (up to 200 guests). For an individual use guest_id for a visible guestbook record, or guest_profile_id for an active member in this collection without a guestbook record; provide exactly one. Reuse perk_id or supply a new definition with currency, expiry and one home, selected homes, a group or the collection. Requires collection ADMIN/MEMBER, and the collection’s membership program must be activated: until it is, the preview reports a MEMBERSHIP_NOT_ACTIVATED blocker and confirm is refused. Start with confirm:false; review the exact recipient count and terms, then confirm:true with the returned preview_hash and the SAME request_id. A changed audience requires a fresh preview. A repeated request is idempotent. Awards appear on signed-in guest accounts; this does not email anyone, enroll members, or charge money. Redemption requires the awarded guest and supported Kismet checkout. Never confirm without the manager’s authorization for these terms and recipients.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "minLength": 1
+          },
+          "award": {
+            "type": "object",
+            "properties": {
+              "request_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "perk_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "definition": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120
+                      },
+                      "description": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "squareMedia": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "url": {
+                                "type": "string",
+                                "format": "uri",
+                                "maxLength": 2048
+                              },
+                              "kind": {
+                                "type": "string",
+                                "enum": [
+                                  "photo",
+                                  "logo"
+                                ]
+                              },
+                              "alt": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 200
+                              }
+                            },
+                            "required": [
+                              "url",
+                              "kind",
+                              "alt"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "discount": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "mechanic": {
+                                "type": "string",
+                                "const": "PERCENT_OFF"
+                              },
+                              "percent": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 100
+                              }
+                            },
+                            "required": [
+                              "mechanic",
+                              "percent"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "mechanic": {
+                                "type": "string",
+                                "const": "FIXED_OFF_CENTS"
+                              },
+                              "cents": {
+                                "type": "integer",
+                                "exclusiveMinimum": 0,
+                                "maximum": 100000000
+                              }
+                            },
+                            "required": [
+                              "mechanic",
+                              "cents"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "scope": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "type": "string",
+                                "const": "collection"
+                              }
+                            },
+                            "required": [
+                              "kind"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "type": "string",
+                                "const": "properties"
+                              },
+                              "propertyIds": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "minItems": 1,
+                                "maxItems": 500
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "propertyIds"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "type": "string",
+                                "const": "group"
+                              },
+                              "groupId": {
+                                "type": "string",
+                                "format": "uuid"
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "groupId"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "expiresAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "stayFrom": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "stayUntil": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "minNights": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 365
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "description",
+                      "discount",
+                      "currency",
+                      "scope",
+                      "expiresAt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "recipient": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "guest"
+                      },
+                      "guest_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "guest_profile_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "audience"
+                      },
+                      "audience_id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "audience_id"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "environment": {
+                "type": "string",
+                "enum": [
+                  "TEST",
+                  "LIVE"
+                ],
+                "default": "LIVE"
+              }
+            },
+            "required": [
+              "request_id",
+              "recipient",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "preview_hash": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 64,
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confirm": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "collection_slug",
+          "award"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "title": "Award a personal booking discount",
+      "annotations": {
+        "title": "Award booking discount",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "instruction": "Call execute with this operation and input. Preserve this action’s approval and confirmation rules."
+    }
+  }
+}

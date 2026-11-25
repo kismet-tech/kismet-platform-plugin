@@ -24,17 +24,11 @@ a time.
 - **The Kismet connection**, configured automatically. Sign in
   with your Kismet manager account when prompted; everything is scoped to the
   collections you manage.
-- **Operating skills:**
-  - `kismet-generate-demand` — diagnose inventory, traffic, conversion, and
-    channel opportunities, then build a bounded cross-channel demand plan.
-  - `kismet-analyze-journeys` — analyze guest journeys and booking performance.
-  - `kismet-manage-catalog` — curate collections, groups, and property
-    merchandising.
-  - `kismet-manage-advertising` — plan and manage ad campaigns and audiences.
-  - `kismet-email-insiders` — plan and operate Insiders email campaigns.
-  - `kismet-manage-webhooks` — configure webhooks and outbound automations.
+- **Operating skills.** The [installed skill directory](plugins/kismet-operators/skills) contains the customer workflows for demand, advertising, journey analysis, catalog, guest CRM, reporting, email drafting and sender setup, webhooks, and ICND pages. The [email draft skill](plugins/kismet-operators/skills/kismet-email-drafts/SKILL.md) prepares copy for the intended audiences and explains where to review it. Saving a campaign depends on the operations available to the signed-in account.
 
-New skills land here automatically as Kismet ships them.
+## Test an operator workflow
+
+Run the [isolated Operator evaluations](evals/operators/README.md) to see how a general-purpose chat model handles real operator questions using synthetic data. Contributors can run the deterministic checks without a model or an account.
 
 ## Install
 
@@ -58,9 +52,6 @@ sign-in — the plugin never handles passwords or API keys.
 
 Questions or requests: [engineering@makekismet.com](mailto:engineering@makekismet.com)
 · [kismet.travel](https://kismet.travel)
-
-Skill content in this repository is published automatically from Kismet's
-source repository; versions here always match what the Kismet platform serves.
 
 ## Kismet for Developers
 
@@ -116,8 +107,6 @@ the application being built, never in the plugin configuration.
 
 ## About this repository
 
-Skill content under `plugins/kismet-operators/skills/` is maintained in
-Kismet's internal source repository and published here by an automated sync
-(see the `.sync` stamp for provenance). Pull requests that edit operator skill
-files directly will be overwritten by the next sync. The developer plugin is
-reviewed against the canonical Developer MCP recipe and operation registry.
+The public Operator package lives in `plugins/kismet-operators/`. Submit customer-facing skills and their synthetic regression cases here after the infrastructure publisher cutover. Until the upstream mirror has been retired, submit changes to mirrored skill files through the infrastructure publisher. The existing `.sync` is the provenance of the last imported release.
+
+For a customer release, review the skills, run the Operator evals, and update the Operator version in its Claude and Codex plugin manifests and its Claude marketplace entry together. Use the reviewed public commit as the downstream pin for bundled downloads and shared internal skills. The developer plugin has its own release and guidance.

@@ -5,15 +5,15 @@
     "email": "engineering@makekismet.com"
   },
   "metadata": {
-    "description": "Official Kismet plugin marketplace for operators and developers. Operator skill content is mirrored from kismet-infrastructure skills-src by CI; developer guidance is grounded in the public Developer MCP.",
+    "description": "Official Kismet plugin marketplace for operators and developers. The Operators package contains the customer workflow skills. Developer guidance is grounded in the public Developer MCP.",
     "version": "0.2.0"
   },
   "plugins": [
     {
       "name": "kismet-operators",
       "source": "./plugins/kismet-operators",
-      "description": "Kismet for Operators \u2014 the authenticated workspace for running your Kismet business from your AI: curate catalogs, analyze guest journeys, run the guest CRM (search guests, audiences, notes), generate demand, run Insiders email, manage ads and audiences, configure automations, and produce the client-facing Booking Channel & Group Performance report.",
-      "version": "0.3.0",
+      "description": "Kismet for Operators helps signed-in managers inspect bookings and attribution, review advertising, check email sender readiness, manage catalogs and guest audiences, and configure webhooks. Available actions depend on the collection and account.",
+      "version": "0.3.1",
       "author": {
         "name": "Kismet",
         "email": "engineering@makekismet.com"

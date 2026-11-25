@@ -1,0 +1,1370 @@
+{
+  "skills": {
+    "Set up my collection": "Find approved sources, setup progress, actor and next link.",
+    "Check my catalog": "Read roster and groups, verify eligible inventory and specific stay quotes.",
+    "Find demand opportunities": "Diagnose sellable capacity, pace and demand; recommend one intervention.",
+    "Understand guest conversion": "Interpret funnel stages and use scoped analytics to investigate.",
+    "Email past guests": "Select a consented audience, prepare a draft and approve dispatch.",
+    "Manage paid ads": "Read ads, prepare a paused Google campaign and control spend.",
+    "Review campaign results": "Compare email and ad results; preserve windows, channel, visits and attribution bases."
+  },
+  "tools": {
+    "create_email_draft": {
+      "description": "Preview or save a draft for an explicit audience, subject and body. Draft only. Draft preflight also returns sender readiness.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string"
+          },
+          "audience_id": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "confirm": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "collection_slug",
+          "audience_id",
+          "subject",
+          "body"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "create_paused_google_campaign": {
+      "description": "Preview or confirm creation of a paused Google campaign.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string"
+          },
+          "daily_budget_usd": {
+            "type": "number"
+          },
+          "destination_group": {
+            "type": "string"
+          },
+          "confirm": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "collection_slug",
+          "daily_budget_usd"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "enable_google_campaign": {
+      "description": "Preview or confirm enabling spend for an existing Google campaign, within the current budget.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string"
+          },
+          "campaign_id": {
+            "type": "string"
+          },
+          "confirm": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "collection_slug",
+          "campaign_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "get_ads": {
+      "description": "Read an ads report for one collection. Choose report sections. Google supports all sections. Meta supports account health and provider-reported attribution in this fixture. Use include_archived for archived campaigns or refresh_health for a current Google health check. For grouped, sorted, or campaign-filtered terms, use get_ads_search_terms.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "google",
+              "meta"
+            ]
+          },
+          "days": {
+            "type": "integer"
+          },
+          "include": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "account_health",
+                "campaigns",
+                "performance",
+                "attribution",
+                "search_terms"
+              ]
+            }
+          },
+          "campaigns_cursor": {
+            "type": "string"
+          },
+          "search_terms_cursor": {
+            "type": "string"
+          },
+          "include_archived": {
+            "type": "boolean"
+          },
+          "refresh_health": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "collection_slug",
+          "platform",
+          "days"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "get_ads_demand_window": {
+      "description": "Read seasonal advertising demand by window.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "description": "A collection you have access to."
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "google",
+              "openai"
+            ],
+            "description": "Ad channel. 'google' (default) or 'openai' (ChatGPT Ads). The demand read is the same; the click-month return exists for Google only."
+          },
+          "days": {
+            "type": "integer",
+            "minimum": 7,
+            "maximum": 365,
+            "description": "How far back to read landings and price checks (default 90). Bookings from those sessions count whenever they land."
+          },
+          "months": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12,
+            "description": "How many click months to report the return for (default 3)."
+          },
+          "include_receipts": {
+            "type": "boolean",
+            "description": "Include every booking behind the cohort table (default false; the table alone is usually enough)."
+          }
+        },
+        "required": [
+          "collection_slug"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "get_ads_search_terms": {
+      "description": "Read paginated Google paid search terms with campaign, grouping and sorting filters.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "description": "A collection you have access to."
+          },
+          "days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 365,
+            "description": "Lookback window in days (default 30)."
+          },
+          "campaign_id": {
+            "type": "string",
+            "description": "Optional Google campaign id (the numeric id from the campaign resource name) to restrict to one campaign."
+          },
+          "sort": {
+            "type": "string",
+            "enum": [
+              "spend",
+              "clicks",
+              "impressions",
+              "conversions"
+            ],
+            "description": "Sort key, descending. Default 'spend'."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500,
+            "description": "Rows per page (default 100)."
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor from a previous page (nextCursor)."
+          },
+          "group_by": {
+            "type": "string",
+            "enum": [
+              "term_campaign",
+              "term",
+              "ad_group"
+            ],
+            "description": "Row granularity. 'term_campaign' (default): one row per query per campaign. 'term': one row per query across campaigns. 'ad_group': Google's raw rows."
+          }
+        },
+        "required": [
+          "collection_slug"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "get_attribution_funnel": {
+      "description": "Read collection conversion funnel stages.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "description": "A collection you have access to."
+          },
+          "days": {
+            "type": "integer",
+            "enum": [
+              7,
+              30,
+              90
+            ],
+            "description": "The window in days ending today: 7, 30 (default, the page default) or 90. The delta compares against the window of the same length before it."
+          }
+        },
+        "required": [
+          "collection_slug"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "get_campaign_stats": {
+      "description": "Read email campaign delivery, clicks and clicked-to-session results.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "campaign_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaign_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "get_catalog_groups": {
+      "description": "List collection groups or inspect one group.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string"
+          },
+          "group_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "collection_slug"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "get_catalog_properties": {
+      "description": "Read the catalog roster, optionally filtered by property ID, slug or published status. Request detail fields for one property.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string"
+          },
+          "property_id": {
+            "type": "string"
+          },
+          "property_slug": {
+            "type": "string"
+          },
+          "published": {
+            "type": "boolean"
+          },
+          "detail": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "collection_slug"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "get_collection_status": {
+      "description": "Read one authorized collection status section. booking_readiness returns imported, quotable and bookable counts and blockers. email_sender returns sender verification, time checked and next step for a collection-owned domain; email module and ADMIN required. Read only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string"
+          },
+          "section": {
+            "type": "string",
+            "enum": [
+              "booking_readiness",
+              "email_sender"
+            ]
+          },
+          "domain": {
+            "type": "string",
+            "description": "Optional collection-owned domain for email_sender."
+          }
+        },
+        "required": [
+          "collection_slug",
+          "section"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "get_data_dictionary": {
+      "description": "Discover available scoped analytics views and columns.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    "get_open_capacity": {
+      "description": "Read sellable capacity over stay dates.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "description": "A collection you have access to."
+          },
+          "from": {
+            "type": "string",
+            "description": "First stay night, YYYY-MM-DD (inclusive)."
+          },
+          "to": {
+            "type": "string",
+            "description": "Last stay night, YYYY-MM-DD (inclusive)."
+          },
+          "group_slug": {
+            "type": "string",
+            "description": "Optional group (VRGroup) slug — restricts to its member homes."
+          },
+          "dow": {
+            "type": "string",
+            "enum": [
+              "all",
+              "weekend",
+              "midweek"
+            ],
+            "description": "Night filter: weekend = Friday + Saturday nights. Default all."
+          },
+          "slice_by": {
+            "type": "string",
+            "enum": [
+              "total",
+              "month",
+              "week",
+              "dow",
+              "home"
+            ],
+            "description": "Aggregation grain. Default total. home: one slice per home (key = home id, home = {id, name, slug}), ordered by open nights, most open first."
+          }
+        },
+        "required": [
+          "collection_slug",
+          "from",
+          "to"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "get_setup": {
+      "description": "Read outstanding Setup steps and next-action links.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "collection_slug"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "get_stay_quote": {
+      "description": "Price one dated stay and report completeness.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "description": "Slug (or id) of a collection you can access."
+          },
+          "property_slug": {
+            "type": "string",
+            "description": "Slug of the property within that collection (from search_properties)."
+          },
+          "check_in": {
+            "type": "string",
+            "description": "Arrival date, YYYY-MM-DD."
+          },
+          "check_out": {
+            "type": "string",
+            "description": "Departure date, YYYY-MM-DD."
+          },
+          "guests": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "People on the stay. Default 2."
+          },
+          "pets": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Pets on the stay. Default 0, which prices no pet fee and says so; pass the real count for a pet-friendly home."
+          }
+        },
+        "required": [
+          "collection_slug",
+          "property_slug",
+          "check_in",
+          "check_out"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "list_audiences": {
+      "description": "List saved guest marketing audiences.",
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "collection_slug"
+        ],
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "description": "Collection to list audiences for."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "list_my_collections": {
+      "description": "List accessible collections, roles and module activation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    "list_sources": {
+      "description": "List supported sources of record.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    "pause_google_campaign": {
+      "description": "Preview or confirm pausing an existing Google campaign.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string"
+          },
+          "campaign_id": {
+            "type": "string"
+          },
+          "confirm": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "collection_slug",
+          "campaign_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "preview_audience": {
+      "description": "Preview eligible audience size, without saving or sending.",
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "collection_slug"
+        ],
+        "properties": {
+          "collection_slug": {
+            "type": "string"
+          },
+          "filters": {
+            "$ref": "#/$defs/filters"
+          },
+          "parts": {
+            "$ref": "#/$defs/parts"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "run_readonly_sql": {
+      "description": "Read-only analytics against permitted manager views; excludes unauthorized collections and gated data.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "A single read-only SELECT or WITH query over the mgr_insight_v_* views."
+          },
+          "params": {
+            "type": "array",
+            "description": "Positional parameters for $1, $2, … in the query (use these for values).",
+            "items": {}
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Row cap (default 1000, max 10000). Auto-applied if the query has no LIMIT.",
+            "minimum": 1,
+            "maximum": 10000
+          },
+          "dry_run": {
+            "type": "boolean",
+            "description": "If true, validate the query (EXPLAIN) without executing it."
+          },
+          "include_staging": {
+            "type": "boolean",
+            "description": "Default false. The content-events view returns production traffic only; rows from staging, development, preview and local hosts are excluded so they never inflate guest counts. Set true ONLY to verify a smoke, then filter on the environment column yourself."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "save_audience": {
+      "description": "Preview then confirm persistence of a guest audience.",
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "collection_slug",
+          "name"
+        ],
+        "properties": {
+          "collection_slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Audience name (1-160 chars)."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "DYNAMIC",
+              "FIXED"
+            ],
+            "description": "Default DYNAMIC."
+          },
+          "filters": {
+            "$ref": "#/$defs/filters"
+          },
+          "parts": {
+            "$ref": "#/$defs/parts"
+          },
+          "confirm": {
+            "type": "boolean",
+            "description": "Must be true to write. Omit for a dry-run preview."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "schedule_email_campaign": {
+      "description": "Preview or confirm sending an existing draft now or later, excluding guests without marketing consent.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string"
+          },
+          "campaign_id": {
+            "type": "string"
+          },
+          "confirm": {
+            "type": "boolean"
+          },
+          "scheduled_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaign_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "search_properties": {
+      "description": "Search bookable inventory with dated criteria.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "collection_slug": {
+            "type": "string",
+            "description": "Slug (or id) of a collection you can access to search within."
+          },
+          "dateWindows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "checkIn",
+                "checkOut"
+              ],
+              "properties": {
+                "checkIn": {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "checkOut": {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                }
+              }
+            },
+            "description": "Up to 5 date windows to check availability and pricing across. Each window returns per-property availability. Omit for browse mode — browse results carry the nightly anchor \"from\" price only, never a dated total.",
+            "maxItems": 5
+          },
+          "guests": {
+            "type": "number",
+            "description": "Number of guests"
+          },
+          "sleeps": {
+            "type": "number",
+            "description": "Minimum sleeping capacity"
+          },
+          "bedrooms": {
+            "type": "number",
+            "description": "Minimum bedrooms needed"
+          },
+          "petsRequired": {
+            "type": "boolean",
+            "description": "Pet-friendly only"
+          },
+          "budgetMaxPerNight": {
+            "type": "number",
+            "description": "Max nightly budget in major currency units"
+          },
+          "propertyTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Property type(s). The coarse family (house vs apartment) is the only hard filter; a specific subtype (e.g. \"cabin\", \"a-frame\") returns its whole family with that subtype boosted — cross-manager interleaving may still rank other family members above it; never zero results."
+          },
+          "region": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter by state/region (e.g., [\"Vermont\"]). Case-insensitive."
+          },
+          "locality": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter by city/town name (e.g., [\"Stowe\"], [\"Seaside\", \"Cannon Beach\"]). Case-insensitive."
+          },
+          "country": {
+            "type": "string",
+            "description": "Filter by ISO alpha-2 country code (e.g., \"US\")"
+          },
+          "nearLat": {
+            "type": "number",
+            "description": "POINT MODE: Latitude to search near"
+          },
+          "nearLng": {
+            "type": "number",
+            "description": "POINT MODE: Longitude"
+          },
+          "nearRadius": {
+            "type": "number",
+            "description": "POINT MODE: Max distance. Default 25."
+          },
+          "nearUnit": {
+            "type": "string",
+            "enum": [
+              "miles",
+              "kilometers"
+            ],
+            "description": "Default \"miles\"."
+          },
+          "swLat": {
+            "type": "number",
+            "description": "BOUNDS MODE: Southwest latitude"
+          },
+          "swLng": {
+            "type": "number",
+            "description": "BOUNDS MODE: Southwest longitude"
+          },
+          "neLat": {
+            "type": "number",
+            "description": "BOUNDS MODE: Northeast latitude"
+          },
+          "neLng": {
+            "type": "number",
+            "description": "BOUNDS MODE: Northeast longitude"
+          },
+          "persona": {
+            "type": "string",
+            "description": "Soft ranking signal — boost properties popular with a guest persona (e.g., \"hiking\", \"romantic\", \"young_family\", \"pet_owners\", \"fishing\", \"luxury\"). Does NOT hard-filter."
+          },
+          "feature": {
+            "type": "string",
+            "description": "Soft ranking signal — boost properties with a guest-confirmed feature (e.g., \"mountain_views\", \"spotless_clean\", \"hot_tub\", \"cozy\", \"beachfront\"). Does NOT hard-filter."
+          },
+          "semanticFilters": {
+            "type": "object",
+            "description": "Reserved optional evidence-backed semantic criteria that complement the explicit location, date, capacity, pet, property-type, and budget filters. Put true must-haves in `required`; put preferences that should improve ranking without excluding otherwise valid stays in `requested`. Until server instructions announce that semantic matching is enabled, omit this field.",
+            "properties": {
+              "required": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "description": "Natural-language must-haves. Every returned property must have listing, policy, amenity, or review evidence for each criterion; never infer a match from missing data."
+              },
+              "requested": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "description": "Natural-language preferences used as soft ranking signals. A property may still be returned when one or more requested preferences are not evidenced."
+              }
+            },
+            "additionalProperties": false
+          },
+          "sort": {
+            "type": "string",
+            "enum": [
+              "relevance",
+              "price_asc",
+              "price_desc",
+              "beds_desc",
+              "name_asc"
+            ],
+            "description": "Sort order. Default \"relevance\"."
+          },
+          "maxProperties": {
+            "type": "number",
+            "description": "Max results. Default 20."
+          },
+          "offset": {
+            "type": "number",
+            "description": "Pagination offset. Default 0."
+          }
+        },
+        "required": [
+          "collection_slug"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "filters": {
+      "type": "object",
+      "description": "The audience rule. All fields optional and combinable (AND). Rolling fields re-resolve at every evaluation, so a saved rule stays evergreen.",
+      "properties": {
+        "vrSlugs": {
+          "type": "string",
+          "description": "Comma-separated property slugs — qualifying stay at ANY of them."
+        },
+        "channel": {
+          "type": "string",
+          "description": "Comma list of booking channels the qualifying stay used: DIRECT, AIRBNB, VRBO, BOOKING_COM, EXPEDIA, KISMET, OTHER."
+        },
+        "minBedrooms": {
+          "type": "number",
+          "description": "Qualifying stay at a home with >= N bedrooms."
+        },
+        "maxBedrooms": {
+          "type": "number"
+        },
+        "minSleeps": {
+          "type": "number",
+          "description": "Home sleeping capacity range."
+        },
+        "maxSleeps": {
+          "type": "number"
+        },
+        "minParty": {
+          "type": "number",
+          "description": "Party size on the qualifying stay (set min=max for exact)."
+        },
+        "maxParty": {
+          "type": "number"
+        },
+        "stayedFrom": {
+          "type": "string",
+          "description": "Qualifying stay check-in on/after YYYY-MM-DD."
+        },
+        "stayedTo": {
+          "type": "string",
+          "description": "Qualifying stay check-in on/before YYYY-MM-DD."
+        },
+        "windowAnchor": {
+          "type": "string",
+          "enum": [
+            "stay",
+            "booked"
+          ],
+          "description": "What the stayedFrom/To (or rolling) window keys on: 'stay' = check-in date (travel season), 'booked' = booking date (purchase cadence — e.g. booked ~1 year ago)."
+        },
+        "stayedDaysAheadFrom": {
+          "type": "number",
+          "description": "Rolling window start = today + N days (negative = past)."
+        },
+        "stayedDaysAheadTo": {
+          "type": "number",
+          "description": "Rolling window end = today + N days."
+        },
+        "stayedYearsBack": {
+          "type": "number",
+          "description": "Shift the rolling window back N years."
+        },
+        "minStays": {
+          "type": "number",
+          "description": "Lifetime completed stays >= N."
+        },
+        "maxStays": {
+          "type": "number"
+        },
+        "minSpendCents": {
+          "type": "number",
+          "description": "Lifetime spend >= N cents (or per-stay with spendBasis)."
+        },
+        "maxSpendCents": {
+          "type": "number"
+        },
+        "spendBasis": {
+          "type": "string",
+          "enum": [
+            "total",
+            "perStay"
+          ]
+        },
+        "lastStayBefore": {
+          "type": "string",
+          "description": "Last stay strictly before YYYY-MM-DD (lapsed guests)."
+        },
+        "lastStayAfter": {
+          "type": "string",
+          "description": "Last stay on/after YYYY-MM-DD (active since)."
+        },
+        "notBookedSince": {
+          "type": "boolean",
+          "description": "Rolling \"not rebooked\": last stay before today — excludes anyone with an upcoming reservation."
+        },
+        "crossBrand": {
+          "type": "boolean",
+          "description": "Only cross-brand guests (stays span 2+ family collections, or the same profile appears in a sibling collection)."
+        },
+        "clvBand": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "likely",
+              "possible",
+              "low"
+            ]
+          },
+          "description": "Return-likelihood band (CLV v0), AFTER the recency modifier: likely = ≥35% of guests like this one book again within a year · possible = 15–35% · low = <15%. Scored per row by the same scorer as the guestbook chip and get_guest.stats.clv (never a second model). Rows the model cannot score (no paying stay / too little history) match no band. Combine with minSpendCents for \"who is worth winning back\"."
+        },
+        "clvModifier": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "lapsing",
+              "returning_booked",
+              "none"
+            ]
+          },
+          "description": "The FACT that overrides the band: lapsing = last stay >14 months ago and nothing booked (the win-back signal) · returning_booked = a future stay is on file (they ARE returning — usually exclude from win-back sends) · none = neither. Rolling by construction — nothing to drift."
+        },
+        "party": {
+          "type": "boolean",
+          "description": "Count a stay for the whole travel party, not only the booker: true matches anyone recorded on the reservation (booker, companions, primary guest). Applies to stay clauses (windows[] with event 'stay', and stayedFrom/To); booking-date clauses stay the booker's. Set it on the rule-level filters and every part inherits it. A has-clause matches anyone who was on a matching stay; a none-clause excludes anyone who was. Use it for past-guest sends (\"everyone who stayed last winter\"). Default off."
+        },
+        "windows": {
+          "type": "array",
+          "maxItems": 8,
+          "description": "Composable has/none clauses — the power grammar. Example rewarming pair: [{\"kind\":\"has\",\"event\":\"booked\",\"window\":{\"fromDays\":-364,\"toDays\":-343}},{\"kind\":\"none\",\"event\":\"booked\",\"window\":{\"fromDays\":-343,\"toDays\":0}}].",
+          "items": {
+            "type": "object",
+            "required": [
+              "kind",
+              "event"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "has",
+                  "none"
+                ],
+                "description": "Existence vs absence."
+              },
+              "event": {
+                "type": "string",
+                "enum": [
+                  "stay",
+                  "booked"
+                ],
+                "description": "Check-in vs booking date."
+              },
+              "window": {
+                "type": "object",
+                "description": "A time window: absolute (from/to dates) OR rolling (fromDays/toDays offsets resolved against today at every evaluation; NEGATIVE = the past; yearsBack shifts whole years). Either end may be open.",
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "description": "YYYY-MM-DD (absolute start)."
+                  },
+                  "to": {
+                    "type": "string",
+                    "description": "YYYY-MM-DD (absolute end)."
+                  },
+                  "fromDays": {
+                    "type": "number",
+                    "description": "Rolling start = today + N days (negative = past)."
+                  },
+                  "toDays": {
+                    "type": "number",
+                    "description": "Rolling end = today + N days."
+                  },
+                  "yearsBack": {
+                    "type": "number",
+                    "description": "Shift a rolling window back N whole years (\"this window, last year\")."
+                  }
+                }
+              },
+              "booked": {
+                "type": "object",
+                "description": "Second window on the SAME reservation's BOOKING date (stay clauses only) — the personal booking-anniversary coupling. Example: {\"kind\":\"has\",\"event\":\"stay\",\"window\":{\"from\":\"2025-12-26\",\"to\":\"2026-01-04\"},\"booked\":{\"fromDays\":-371,\"toDays\":-364}} = \"their New Year's stay was booked this week last year\" — each week a fresh cohort rolls in, so an always-on send lands in each guest's own booking week. Shift the offsets back to fire early.",
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "description": "YYYY-MM-DD (absolute start)."
+                  },
+                  "to": {
+                    "type": "string",
+                    "description": "YYYY-MM-DD (absolute end)."
+                  },
+                  "fromDays": {
+                    "type": "number",
+                    "description": "Rolling start = today + N days (negative = past)."
+                  },
+                  "toDays": {
+                    "type": "number",
+                    "description": "Rolling end = today + N days."
+                  },
+                  "yearsBack": {
+                    "type": "number",
+                    "description": "Shift a rolling window back N whole years (\"this window, last year\")."
+                  }
+                }
+              },
+              "match": {
+                "type": "object",
+                "description": "Constraints on the SAME reservation (has-clauses).",
+                "properties": {
+                  "vrSlugs": {
+                    "type": "string"
+                  },
+                  "minBedrooms": {
+                    "type": "number"
+                  },
+                  "maxBedrooms": {
+                    "type": "number"
+                  },
+                  "channel": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "minLeadDays": {
+          "type": "number",
+          "description": "Booking lead-time habit: a qualifying stay was BOOKED at least N days before its own check-in (vendor booking time). minLeadDays: 180 = long-lead planners — reach them around their booking anniversary, months before the season. Rolling by construction."
+        },
+        "maxLeadDays": {
+          "type": "number",
+          "description": "Upper lead bound: maxLeadDays: 30 = spontaneous bookers — the audience for gap-fill flash offers. Combine with minLeadDays for a band."
+        },
+        "shopperDays": {
+          "type": "number",
+          "description": "Live demand: an active journey at this collection within the last N days — the search_guests-composable form of list_shoppers. \"Repeat guests shopping RIGHT NOW\" = minStays: 2 + shopperDays: 7, the highest-value moment the CDP can name."
+        },
+        "shopperStages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "researching",
+              "shortlisting",
+              "planning",
+              "intent",
+              "converted",
+              "abandoned",
+              "dormant"
+            ]
+          },
+          "description": "Narrow shopperDays to funnel stages (e.g. [\"planning\",\"intent\"])."
+        },
+        "emailEngagedDays": {
+          "type": "number",
+          "description": "Campaign-email engagement: opened or clicked a campaign email in the last N days (the SendGrid webhook + open-pixel stamps). \"Warm but not booked\" = emailEngagedDays: 14 + notBookedSince: true."
+        },
+        "customFilterIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "description": "Named SQL-backed rules (create_custom_filter) referenced by id. Each one INTERSECTS with the rest of the rule (narrow-only). Prefer the grammar fields; reach for a custom filter only when the grammar cannot say the slice."
+        }
+      }
+    },
+    "parts": {
+      "type": "array",
+      "maxItems": 8,
+      "description": "Named, described, individually toggleable slices of the rule (AND by intersection). PREFER 2-4 small parts over one flat filter bag: every part renders as a chip with its description as the hover card, and the operator toggles each independently. Each part needs name (≤80 chars), description (1-3 sentences a MARKETER understands — what it matches and why it is here; no counts, they go stale), and filters with at least one predicate. Note: parts intersect as separate evaluations, so two parts may be satisfied by different reservations — use ONE part (or a windows clause with match) when criteria must hold on the SAME stay.",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "filters"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Chip label, ≤80 chars."
+          },
+          "description": {
+            "type": "string",
+            "description": "The part explained to a marketer in clear language — the hover-card copy."
+          },
+          "filters": {
+            "type": "object",
+            "description": "The audience rule. All fields optional and combinable (AND). Rolling fields re-resolve at every evaluation, so a saved rule stays evergreen.",
+            "properties": {
+              "vrSlugs": {
+                "type": "string",
+                "description": "Comma-separated property slugs — qualifying stay at ANY of them."
+              },
+              "channel": {
+                "type": "string",
+                "description": "Comma list of booking channels the qualifying stay used: DIRECT, AIRBNB, VRBO, BOOKING_COM, EXPEDIA, KISMET, OTHER."
+              },
+              "minBedrooms": {
+                "type": "number",
+                "description": "Qualifying stay at a home with >= N bedrooms."
+              },
+              "maxBedrooms": {
+                "type": "number"
+              },
+              "minSleeps": {
+                "type": "number",
+                "description": "Home sleeping capacity range."
+              },
+              "maxSleeps": {
+                "type": "number"
+              },
+              "minParty": {
+                "type": "number",
+                "description": "Party size on the qualifying stay (set min=max for exact)."
+              },
+              "maxParty": {
+                "type": "number"
+              },
+              "stayedFrom": {
+                "type": "string",
+                "description": "Qualifying stay check-in on/after YYYY-MM-DD."
+              },
+              "stayedTo": {
+                "type": "string",
+                "description": "Qualifying stay check-in on/before YYYY-MM-DD."
+              },
+              "windowAnchor": {
+                "type": "string",
+                "enum": [
+                  "stay",
+                  "booked"
+                ],
+                "description": "What the stayedFrom/To (or rolling) window keys on: 'stay' = check-in date (travel season), 'booked' = booking date (purchase cadence — e.g. booked ~1 year ago)."
+              },
+              "stayedDaysAheadFrom": {
+                "type": "number",
+                "description": "Rolling window start = today + N days (negative = past)."
+              },
+              "stayedDaysAheadTo": {
+                "type": "number",
+                "description": "Rolling window end = today + N days."
+              },
+              "stayedYearsBack": {
+                "type": "number",
+                "description": "Shift the rolling window back N years."
+              },
+              "minStays": {
+                "type": "number",
+                "description": "Lifetime completed stays >= N."
+              },
+              "maxStays": {
+                "type": "number"
+              },
+              "minSpendCents": {
+                "type": "number",
+                "description": "Lifetime spend >= N cents (or per-stay with spendBasis)."
+              },
+              "maxSpendCents": {
+                "type": "number"
+              },
+              "spendBasis": {
+                "type": "string",
+                "enum": [
+                  "total",
+                  "perStay"
+                ]
+              },
+              "lastStayBefore": {
+                "type": "string",
+                "description": "Last stay strictly before YYYY-MM-DD (lapsed guests)."
+              },
+              "lastStayAfter": {
+                "type": "string",
+                "description": "Last stay on/after YYYY-MM-DD (active since)."
+              },
+              "notBookedSince": {
+                "type": "boolean",
+                "description": "Rolling \"not rebooked\": last stay before today — excludes anyone with an upcoming reservation."
+              },
+              "crossBrand": {
+                "type": "boolean",
+                "description": "Only cross-brand guests (stays span 2+ family collections, or the same profile appears in a sibling collection)."
+              },
+              "clvBand": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "likely",
+                    "possible",
+                    "low"
+                  ]
+                },
+                "description": "Return-likelihood band (CLV v0), AFTER the recency modifier: likely = ≥35% of guests like this one book again within a year · possible = 15–35% · low = <15%. Scored per row by the same scorer as the guestbook chip and get_guest.stats.clv (never a second model). Rows the model cannot score (no paying stay / too little history) match no band. Combine with minSpendCents for \"who is worth winning back\"."
+              },
+              "clvModifier": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "lapsing",
+                    "returning_booked",
+                    "none"
+                  ]
+                },
+                "description": "The FACT that overrides the band: lapsing = last stay >14 months ago and nothing booked (the win-back signal) · returning_booked = a future stay is on file (they ARE returning — usually exclude from win-back sends) · none = neither. Rolling by construction — nothing to drift."
+              },
+              "party": {
+                "type": "boolean",
+                "description": "Count a stay for the whole travel party, not only the booker: true matches anyone recorded on the reservation (booker, companions, primary guest). Applies to stay clauses (windows[] with event 'stay', and stayedFrom/To); booking-date clauses stay the booker's. Set it on the rule-level filters and every part inherits it. A has-clause matches anyone who was on a matching stay; a none-clause excludes anyone who was. Use it for past-guest sends (\"everyone who stayed last winter\"). Default off."
+              },
+              "windows": {
+                "type": "array",
+                "maxItems": 8,
+                "description": "Composable has/none clauses — the power grammar. Example rewarming pair: [{\"kind\":\"has\",\"event\":\"booked\",\"window\":{\"fromDays\":-364,\"toDays\":-343}},{\"kind\":\"none\",\"event\":\"booked\",\"window\":{\"fromDays\":-343,\"toDays\":0}}].",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "kind",
+                    "event"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "has",
+                        "none"
+                      ],
+                      "description": "Existence vs absence."
+                    },
+                    "event": {
+                      "type": "string",
+                      "enum": [
+                        "stay",
+                        "booked"
+                      ],
+                      "description": "Check-in vs booking date."
+                    },
+                    "window": {
+                      "type": "object",
+                      "description": "A time window: absolute (from/to dates) OR rolling (fromDays/toDays offsets resolved against today at every evaluation; NEGATIVE = the past; yearsBack shifts whole years). Either end may be open.",
+                      "properties": {
+                        "from": {
+                          "type": "string",
+                          "description": "YYYY-MM-DD (absolute start)."
+                        },
+                        "to": {
+                          "type": "string",
+                          "description": "YYYY-MM-DD (absolute end)."
+                        },
+                        "fromDays": {
+                          "type": "number",
+                          "description": "Rolling start = today + N days (negative = past)."
+                        },
+                        "toDays": {
+                          "type": "number",
+                          "description": "Rolling end = today + N days."
+                        },
+                        "yearsBack": {
+                          "type": "number",
+                          "description": "Shift a rolling window back N whole years (\"this window, last year\")."
+                        }
+                      }
+                    },
+                    "booked": {
+                      "type": "object",
+                      "description": "Second window on the SAME reservation's BOOKING date (stay clauses only) — the personal booking-anniversary coupling. Example: {\"kind\":\"has\",\"event\":\"stay\",\"window\":{\"from\":\"2025-12-26\",\"to\":\"2026-01-04\"},\"booked\":{\"fromDays\":-371,\"toDays\":-364}} = \"their New Year's stay was booked this week last year\" — each week a fresh cohort rolls in, so an always-on send lands in each guest's own booking week. Shift the offsets back to fire early.",
+                      "properties": {
+                        "from": {
+                          "type": "string",
+                          "description": "YYYY-MM-DD (absolute start)."
+                        },
+                        "to": {
+                          "type": "string",
+                          "description": "YYYY-MM-DD (absolute end)."
+                        },
+                        "fromDays": {
+                          "type": "number",
+                          "description": "Rolling start = today + N days (negative = past)."
+                        },
+                        "toDays": {
+                          "type": "number",
+                          "description": "Rolling end = today + N days."
+                        },
+                        "yearsBack": {
+                          "type": "number",
+                          "description": "Shift a rolling window back N whole years (\"this window, last year\")."
+                        }
+                      }
+                    },
+                    "match": {
+                      "type": "object",
+                      "description": "Constraints on the SAME reservation (has-clauses).",
+                      "properties": {
+                        "vrSlugs": {
+                          "type": "string"
+                        },
+                        "minBedrooms": {
+                          "type": "number"
+                        },
+                        "maxBedrooms": {
+                          "type": "number"
+                        },
+                        "channel": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "minLeadDays": {
+                "type": "number",
+                "description": "Booking lead-time habit: a qualifying stay was BOOKED at least N days before its own check-in (vendor booking time). minLeadDays: 180 = long-lead planners — reach them around their booking anniversary, months before the season. Rolling by construction."
+              },
+              "maxLeadDays": {
+                "type": "number",
+                "description": "Upper lead bound: maxLeadDays: 30 = spontaneous bookers — the audience for gap-fill flash offers. Combine with minLeadDays for a band."
+              },
+              "shopperDays": {
+                "type": "number",
+                "description": "Live demand: an active journey at this collection within the last N days — the search_guests-composable form of list_shoppers. \"Repeat guests shopping RIGHT NOW\" = minStays: 2 + shopperDays: 7, the highest-value moment the CDP can name."
+              },
+              "shopperStages": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "researching",
+                    "shortlisting",
+                    "planning",
+                    "intent",
+                    "converted",
+                    "abandoned",
+                    "dormant"
+                  ]
+                },
+                "description": "Narrow shopperDays to funnel stages (e.g. [\"planning\",\"intent\"])."
+              },
+              "emailEngagedDays": {
+                "type": "number",
+                "description": "Campaign-email engagement: opened or clicked a campaign email in the last N days (the SendGrid webhook + open-pixel stamps). \"Warm but not booked\" = emailEngagedDays: 14 + notBookedSince: true."
+              },
+              "customFilterIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 8,
+                "description": "Named SQL-backed rules (create_custom_filter) referenced by id. Each one INTERSECTS with the rest of the rule (narrow-only). Prefer the grammar fields; reach for a custom filter only when the grammar cannot say the slice."
+              }
+            }
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Default true. false PARKS the part: kept in the rule, skipped at evaluation (the operator toggle state — never delete a part to disable it)."
+          }
+        }
+      }
+    }
+  }
+}
