@@ -1,0 +1,12 @@
+{
+  "question": "What did my Meta ads book?",
+  "collection": "cedar-demo",
+  "asOf": "2026-06-07T15:20:00Z",
+  "windowDays": 30,
+  "scenarios": [
+    {"id":"partial-receipts","reportedClick":5,"reportedView":2,"namedClick":3,"namedView":1,"receipts":2},
+    {"id":"legacy-missing","reportedClick":5,"reportedView":2,"namedClick":3,"namedView":1},
+    {"id":"known-zero","reportedClick":5,"reportedView":2,"namedClick":3,"namedView":1,"receipts":0},
+    {"id":"view-only","reportedClick":0,"reportedView":4,"namedClick":0,"namedView":2,"receipts":2}
+  ]
+}

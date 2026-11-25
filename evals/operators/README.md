@@ -90,3 +90,5 @@ python evals/operators/review/paired.py /tmp /tmp/scored.jsonl --decisions /tmp/
 ```
 
 The JSON decisions object maps each opaque item ID to a boolean `pass` and a short `reason`. Review against the frozen protocol. A state failure or runtime error still fails the trial. Retain the raw packet and review decisions. For an independent release set, have a second person select fresh, redacted operator questions from a later period. Keep each customer conversation and its paraphrases together in one split. Keep those cases outside the public repo until the contract and scorer are frozen. After revealing a set, use it for regression coverage and draw a new one for the next release decision.
+
+For the cross-repo comparison of Sonny and the external connector on the same Meta attribution payloads, see the [replay and scoring instructions](meta_parity/README.md) and the [November 24 side-by-side results](baselines/2026-11-24-meta-parity.md).
